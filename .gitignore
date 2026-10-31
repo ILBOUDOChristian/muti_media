@@ -12,3 +12,13 @@ dist/
 *.pem
 *.key
 *.p12
+
+# 3D assets & models
+*.glb
+*.gltf
+*.obj
+*.fbx
+*.stl
+*.blend
+*.blend1
+.agents/

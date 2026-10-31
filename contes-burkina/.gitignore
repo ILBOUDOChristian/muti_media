@@ -10,3 +10,12 @@ DEPLOIEMENT.md
 *.pem
 *.key
 *.p12
+
+# 3D assets & heavy model files
+*.glb
+*.gltf
+*.obj
+*.fbx
+*.stl
+*.blend
+*.blend1

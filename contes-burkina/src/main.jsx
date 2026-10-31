@@ -4,9 +4,10 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import {
   ArrowLeft, ArrowRight, ArrowUpRight, BookOpen, ChevronDown, CirclePlay,
-  Compass, ExternalLink, Languages, MapPin, Menu, Pause, Search, Sparkles,
+  Compass, ExternalLink, Languages, Layers, MapPin, Menu, Pause, Search, Sparkles,
   Volume2, X,
 } from 'lucide-react';
+import Interactive3DMap from './Interactive3DMap';
 import './styles.css';
 
 const APP_LOG_PREFIX = '[Les Voix du Faso]';
@@ -121,6 +122,7 @@ function App() {
   const regionLayers = useRef(new Map());
   const localityMarker = useRef(null);
   const [mapRegionsReady, setMapRegionsReady] = useState(false);
+  const [mapMode, setMapMode] = useState('3D'); // '3D' | '2D'
   const [activeStory, setActiveStory] = useState(() => stories.find((story) => story.id === 'nin-keem') || stories[0]);
   const [chapterIndex, setChapterIndex] = useState(0);
   const [playing, setPlaying] = useState(false);
@@ -263,6 +265,9 @@ function App() {
     const regionLayer = regionLayers.current.get(activeStory.localityRegion);
     if (!mapRegionsReady || !map || !regionLayer) return undefined;
 
+    // Invalidate map size so Leaflet container calculates valid dimensions even if toggled
+    map.invalidateSize();
+
     regionLayers.current.forEach((layer) => {
       layer.setStyle({ color: '#b75535', weight: 1.2, fillColor: '#dda047', fillOpacity: 0.08 });
       layer.getElement()?.classList.remove('cultural-region-selected');
@@ -270,21 +275,34 @@ function App() {
     regionLayer.setStyle({ color: '#a9442b', weight: 2.8, fillColor: '#e5a44e', fillOpacity: 0.3 });
     regionLayer.bringToFront();
     regionLayer.getElement()?.classList.add('cultural-region-selected');
-    map.flyToBounds(regionLayer.getBounds(), { padding: [58, 58], maxZoom: 7, duration: 1.6 });
 
-    localityMarker.current?.remove();
-    const icon = L.divIcon({
-      className: 'story-locality-marker',
-      html: '<span class="locality-marker"><span class="locality-marker__halo"></span><span class="locality-marker__shadow"></span><span class="locality-marker__body" aria-hidden="true">✦</span></span>',
-      iconSize: [66, 76],
-      iconAnchor: [33, 64],
-    });
-    localityMarker.current = L.marker(regionLayer.getBounds().getCenter(), { icon, title: activeStory.localityLabel, riseOnHover: true })
-      .addTo(map)
-      .bindTooltip(activeStory.localityLabel, { permanent: true, direction: 'top', offset: [0, -44], className: 'locality-tooltip' });
+    try {
+      const bounds = regionLayer.getBounds?.();
+      if (bounds && bounds.isValid?.()) {
+        const center = bounds.getCenter();
+        if (Number.isFinite(center.lat) && Number.isFinite(center.lng)) {
+          if (mapMode === '2D') {
+            map.flyToBounds(bounds, { padding: [58, 58], maxZoom: 7, duration: 1.6 });
+          }
+
+          localityMarker.current?.remove();
+          const icon = L.divIcon({
+            className: 'story-locality-marker',
+            html: '<span class="locality-marker"><span class="locality-marker__halo"></span><span class="locality-marker__shadow"></span><span class="locality-marker__body" aria-hidden="true">✦</span></span>',
+            iconSize: [66, 76],
+            iconAnchor: [33, 64],
+          });
+          localityMarker.current = L.marker(center, { icon, title: activeStory.localityLabel, riseOnHover: true })
+            .addTo(map)
+            .bindTooltip(activeStory.localityLabel, { permanent: true, direction: 'top', offset: [0, -44], className: 'locality-tooltip' });
+        }
+      }
+    } catch (err) {
+      logApp('warn', 'Could not animate region bounds', { message: err?.message });
+    }
 
     return () => localityMarker.current?.remove();
-  }, [activeStory, mapRegionsReady]);
+  }, [activeStory, mapRegionsReady, mapMode]);
 
   const filteredStories = stories.filter((story) => {
     const matchesLanguage = language === 'Toutes les langues' || story.language === language;
@@ -322,7 +340,11 @@ function App() {
               <a className="primary-button" href="#explorer">Explorer la carte <Compass size={18} aria-hidden="true" /></a>
               <a className="text-button" href="#histoires">Découvrir les récits <ArrowUpRight size={17} aria-hidden="true" /></a>
             </div>
-            <div className="hero-meta"><div><strong>13</strong><span>régions</span></div><div><strong>{stories.length}</strong><span>récits présentés</span></div><div><strong>{new Set(stories.map((story) => story.language)).size}</strong><span>langues représentées</span></div></div>
+            <div className="hero-meta">
+              <div><strong>60+</strong><span>langues au Faso</span></div>
+              <div><strong>100%</strong><span>patrimoine oral</span></div>
+              <div><strong>{new Set(stories.map((story) => story.language)).size}</strong><span>langues intégrées</span></div>
+            </div>
           </div>
           <div className="hero-art" role="img" aria-label="Baobab animé en relief au coucher du soleil">
             <div className="scene-stars" aria-hidden="true"><i /><i /><i /><i /><i /></div>
@@ -338,9 +360,59 @@ function App() {
         </section>
 
         <section className="explorer-section" id="explorer">
-          <div className="section-heading"><div><p className="eyebrow">01 — La carte vivante</p><h2>Explorez par <em>territoire.</em></h2></div><p className="section-intro">Chaque point sur la carte ouvre une fenêtre sur une mémoire, une voix, une histoire.</p></div>
+          <div className="section-heading">
+            <div>
+              <p className="eyebrow">01 — La carte vivante</p>
+              <h2>Explorez par <em>territoire.</em></h2>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <div className="map-view-switcher" role="group" aria-label="Mode d'affichage de la carte">
+                <button
+                  type="button"
+                  className={mapMode === '3D' ? 'switcher-btn active' : 'switcher-btn'}
+                  onClick={() => setMapMode('3D')}
+                  aria-pressed={mapMode === '3D'}
+                >
+                  <Sparkles size={14} aria-hidden="true" /> Vue 3D relief
+                </button>
+                <button
+                  type="button"
+                  className={mapMode === '2D' ? 'switcher-btn active' : 'switcher-btn'}
+                  onClick={() => setMapMode('2D')}
+                  aria-pressed={mapMode === '2D'}
+                >
+                  <Layers size={14} aria-hidden="true" /> Carte 2D OpenStreetMap
+                </button>
+              </div>
+            </div>
+          </div>
           <div className="map-layout">
-            <div className="map-card"><div className="map-toolbar"><span><MapPin size={16} aria-hidden="true" /> Burkina Faso</span><span className="map-hint">{activeStory.localityLabel}</span></div><div className="map-canvas" ref={mapRef} role="application" aria-label={`Carte du Burkina Faso, repère régional pour le récit en ${activeStory.language}`} /></div>
+            <div className="map-card">
+              <div className="map-toolbar">
+                <span><MapPin size={16} aria-hidden="true" /> Burkina Faso · {mapMode === '3D' ? 'Relief 3D du territoire' : 'Carte cartographique'}</span>
+                <span className="map-hint">{activeStory.localityLabel}</span>
+              </div>
+              <div style={{ position: 'relative', height: '430px' }}>
+                <div
+                  className="map-canvas"
+                  ref={mapRef}
+                  role="application"
+                  aria-label={`Carte 2D du Burkina Faso, repère régional pour le récit en ${activeStory.language}`}
+                  style={{ display: mapMode === '2D' ? 'block' : 'none', height: '100%' }}
+                />
+                {mapMode === '3D' && (
+                  <Interactive3DMap
+                    activeRegionName={activeStory.localityRegion}
+                    onSelectStoryRegion={(region) => {
+                      const matchingStory = stories.find((s) => s.localityRegion === region.localityRegion);
+                      if (matchingStory) {
+                        selectStory(matchingStory);
+                      }
+                    }}
+                  />
+                )}
+              </div>
+            </div>
             <aside className="featured-story" aria-live="polite">
               <p className="eyebrow">Récit à découvrir</p>
               <div className="story-info">
@@ -367,7 +439,21 @@ function App() {
 
         <section className="stories-section" id="histoires">
           <div className="section-heading"><div><p className="eyebrow">03 — La collection</p><h2>Des histoires à <em>habiter.</em></h2></div><span className="collection-count">{filteredStories.length} récit{filteredStories.length > 1 ? 's' : ''} présenté{filteredStories.length > 1 ? 's' : ''}</span></div>
-          <div className="filter-row"><label className="search-field"><Search size={17} aria-hidden="true" /><span className="sr-only">Rechercher un récit</span><input type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Rechercher un récit…" /></label><label className="select-field"><Languages size={17} aria-hidden="true" /><span className="sr-only">Filtrer par langue</span><select value={language} onChange={(event) => setLanguage(event.target.value)}><option>Toutes les langues</option><option>Bissa</option><option>Dioula</option><option>Mooré</option><option>Fulfulde</option></select><ChevronDown size={15} aria-hidden="true" /></label></div>
+          <div className="filter-row">
+            <div className="search-field">
+              <label htmlFor="search-recit-input" className="sr-only">Rechercher un récit</label>
+              <Search size={17} aria-hidden="true" />
+              <input id="search-recit-input" type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Rechercher un récit…" />
+            </div>
+            <div className="select-field">
+              <label htmlFor="filter-langue-select" className="sr-only">Filtrer par langue</label>
+              <Languages size={17} aria-hidden="true" />
+              <select id="filter-langue-select" value={language} onChange={(event) => setLanguage(event.target.value)}>
+                <option>Toutes les langues</option><option>Bissa</option><option>Dioula</option><option>Mooré</option><option>Fulfulde</option>
+              </select>
+              <ChevronDown size={15} aria-hidden="true" />
+            </div>
+          </div>
           <div className="story-grid">{filteredStories.map((story) => <button className="story-card" type="button" key={story.id} onClick={() => { selectStory(story); document.querySelector('#explorer')?.scrollIntoView({ behavior: 'smooth' }); }} aria-label={`Découvrir ${story.title}`}><img className="card-image" src={story.image} alt={`Visuel transmis pour le récit en ${story.language}`} loading="lazy" onError={(event) => { event.currentTarget.remove(); }} /><div className="card-content">{story.catalogue && <small className="catalogue-label">{story.catalogue}</small>}<div className="story-tags"><span>{story.type}</span><span>{story.language}</span></div><h3>{story.title}</h3>{(story.region || story.duration) && <p>{story.region}{story.duration && <> <span>·</span> {story.duration}</>}</p>}</div><ArrowUpRight className="card-arrow" size={18} aria-hidden="true" /></button>)}</div>
           {filteredStories.length === 0 && <p className="empty-state">Aucun récit ne correspond à votre recherche.</p>}
         </section>
@@ -398,33 +484,40 @@ function ContributionDialog({ onClose, onSubmit, saving, error, sent }) {
             <h2 id="contribution-title">Partager un récit</h2>
             <p className="dialog-intro">Saisis la transcription ou joins un fichier, puis ajoute l’enregistrement audio du conte.</p>
             <form onSubmit={onSubmit}>
-              <label>Nom de la personne qui transmet
-                <input name="contributor" required maxLength="80" placeholder="Nom du conteur ou de la conteuse" />
-              </label>
-              <label>Titre du conte
-                <input name="title" required maxLength="120" placeholder="Ex. Nin-kẽem a yembr kibare" />
-              </label>
-              <label>Transcription du conte
-                <textarea name="story" maxLength="30000" rows="5" placeholder="Tu peux saisir ou coller la transcription ici…" />
-              </label>
-              <label className="file-upload-label">Joindre la transcription (facultatif)
-                <input className="file-upload-input" name="transcriptionFile" type="file" accept=".txt,.pdf,.doc,.docx,text/plain,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" />
-                <small>TXT, PDF, DOC ou DOCX · 10 Mo maximum</small>
-              </label>
-              <label className="file-upload-label">Joindre l’audio (facultatif)
-                <input className="file-upload-input" name="audioFile" type="file" accept="audio/*,.mp3,.wav,.m4a,.aac,.ogg,.opus,.webm" />
-                <small>MP3, WAV, M4A, AAC, OGG ou WebM · 25 Mo maximum</small>
-              </label>
+              <div className="form-group">
+                <label htmlFor="contributor-input">Nom de la personne qui transmet</label>
+                <input id="contributor-input" name="contributor" required maxLength="80" placeholder="Nom du conteur ou de la conteuse" />
+              </div>
+              <div className="form-group">
+                <label htmlFor="title-input">Titre du conte</label>
+                <input id="title-input" name="title" required maxLength="120" placeholder="Ex. Nin-kẽem a yembr kibare" />
+              </div>
+              <div className="form-group">
+                <label htmlFor="story-input">Transcription du conte</label>
+                <textarea id="story-input" name="story" maxLength="30000" rows="5" placeholder="Tu peux saisir ou coller la transcription ici…" />
+              </div>
+              <div className="form-group file-upload-group">
+                <label htmlFor="transcriptionFile-input" className="file-upload-label">Joindre la transcription (facultatif)</label>
+                <input id="transcriptionFile-input" className="file-upload-input" name="transcriptionFile" type="file" accept=".txt,.pdf,.doc,.docx,text/plain,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" />
+                <span className="file-hint">TXT, PDF, DOC ou DOCX · 10 Mo maximum</span>
+              </div>
+              <div className="form-group file-upload-group">
+                <label htmlFor="audioFile-input" className="file-upload-label">Joindre l’audio (facultatif)</label>
+                <input id="audioFile-input" className="file-upload-input" name="audioFile" type="file" accept="audio/*,.mp3,.wav,.m4a,.aac,.ogg,.opus,.webm" />
+                <span className="file-hint">MP3, WAV, M4A, AAC, OGG ou WebM · 25 Mo maximum</span>
+              </div>
               <div className="form-row">
-                <label>Région
-                  <input name="region" required maxLength="80" placeholder="Ex. Centre" />
-                </label>
-                <label>Langue
-                  <select name="language" required defaultValue="">
+                <div className="form-group">
+                  <label htmlFor="region-input">Région</label>
+                  <input id="region-input" name="region" required maxLength="80" placeholder="Ex. Centre" />
+                </div>
+                <div className="form-group">
+                  <label htmlFor="language-input">Langue</label>
+                  <select id="language-input" name="language" required defaultValue="">
                     <option value="" disabled>Choisir</option>
                     <option>Bissa</option><option>Dioula</option><option>Mooré</option><option>Fulfulde</option><option>Autre</option>
                   </select>
-                </label>
+                </div>
               </div>
               {error && <p className="form-error" role="alert">{error}</p>}
               <button className="primary-button" type="submit" disabled={saving}>
