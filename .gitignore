@@ -1,0 +1,14 @@
+node_modules/
+dist/
+.vercel/
+.opencode/
+.github/prompts/
+
+.env
+.env.*
+!.env.example
+
+*.log
+*.pem
+*.key
+*.p12

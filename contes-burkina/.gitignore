@@ -1,0 +1,12 @@
+node_modules/
+dist/
+.vercel/
+.opencode/
+.github/prompts/
+DEPLOIEMENT.md
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
