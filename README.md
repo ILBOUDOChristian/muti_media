@@ -13,8 +13,6 @@ Plateforme web immersive visant à préserver, numériser et transmettre le patr
 4. [Installation & Émulation Locale](#-installation--émulation-locale)
 5. [Scripts Utiles](#-scripts-utiles)
 6. [Accessibilité (WAVE & WCAG AA)](#-accessibilité-wave--wcag-aa)
-7. [Rapport Académique](#-rapport-académique)
-
 ---
 
 ## 🌟 Fonctionnalités Clés
@@ -75,7 +73,6 @@ multi/
     │   └── styles.css              # Design système & charte accessible
     ├── index.html
     ├── package.json
-    ├── RAPPORT.md                  # Rapport académique complet
     └── vercel.json                 # Déploiement en production
 ```
 
@@ -129,13 +126,3 @@ L'application a été auditée et optimisée selon les normes **WCAG 2.1 AA** et
 - **0 erreur de contraste :** contrastes de texte supérieurs à 4.8:1 sur fond clair et 8:1 sur fond sombre.
 - **Formulaires accessibles :** association stricte des libellés et des champs de saisie (`htmlFor` et `id`).
 - **Typographie lisible :** tailles de police réhaussées (≥ 12px) et support natif de `prefers-reduced-motion`.
-
----
-
-## 📄 Rapport Académique
-
-Le rapport académique complet détaillant le contexte, le cahier des charges, la conception, les choix techniques et l'analyse critique est disponible dans :  
-👉 [`contes-burkina/RAPPORT.md`](contes-burkina/RAPPORT.md)
-
----
-*Projet réalisé pour la valorisation du patrimoine oral du Burkina Faso — Groupe 15 (2026).*

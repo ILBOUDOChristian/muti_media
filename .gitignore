@@ -22,3 +22,6 @@ dist/
 *.blend
 *.blend1
 .agents/
+
+# Rapport académique local
+contes-burkina/RAPPORT.md

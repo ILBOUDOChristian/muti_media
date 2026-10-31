@@ -4,6 +4,7 @@ dist/
 .opencode/
 .github/prompts/
 DEPLOIEMENT.md
+RAPPORT.md
 .env
 .env.*
 !.env.example
