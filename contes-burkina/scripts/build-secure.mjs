@@ -4,7 +4,7 @@ await build({
   configFile: false,
   mode: 'production',
   esbuild: {
-    drop: ['console', 'debugger'],
+    drop: ['debugger'],
     legalComments: 'none',
   },
   build: {

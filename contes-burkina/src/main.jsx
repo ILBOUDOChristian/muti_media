@@ -9,6 +9,43 @@ import {
 } from 'lucide-react';
 import './styles.css';
 
+const APP_LOG_PREFIX = '[Les Voix du Faso]';
+
+function logApp(level, message, details = {}) {
+  console[level](`${APP_LOG_PREFIX} ${message}`, details);
+}
+
+window.addEventListener('error', (event) => {
+  const resourceUrl = event.target instanceof HTMLImageElement || event.target instanceof HTMLAudioElement
+    ? event.target.currentSrc || event.target.src
+    : undefined;
+  if (resourceUrl) {
+    logApp('error', 'Resource media or image failed to load', {
+      url: resourceUrl,
+      element: event.target.tagName.toLower?.(),
+    }, true);
+    return;
+  }
+  logApp('error', 'Unhandled application error', {
+    message: event.message,
+    source: event.filename,
+    line: event.lineno,
+    column: event.colno,
+  });
+});
+
+window.addEventListener('unhandledrejection', (event) => {
+  logApp('error', 'Unhandled promise rejection', {
+    reason: event.reason instanceof Error ? event.reason.message : String(event.reason),
+  });
+});
+
+logApp('info', 'Application started', {
+  host: window.location.host,
+  pathname: window.location.pathname,
+  protocol: window.location.protocol,
+});
+
 const stories = [
   {
     id: 'conte-bissa', title: 'Conte en Bissa', language: 'Bissa', type: 'Conte', color: 'ochre',
@@ -187,7 +224,14 @@ function App() {
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>', maxZoom: 18,
     }).addTo(map);
     fetch('/geojson/regions.geojson')
-      .then((response) => { if (!response.ok) throw new Error(`Chargement des régions impossible (${response.status})`); return response.json(); })
+      .then((response) => {
+        logApp(response.ok ? 'info' : 'warn', 'Regional GeoJSON request completed', {
+          url: '/geojson/regions.geojson',
+          status: response.status,
+        });
+        if (!response.ok) throw new Error(`Chargement des régions impossible (${response.status})`);
+        return response.json();
+      })
       .then((regions) => {
         if (disposed || !mapRef.current?.isConnected) return;
         const regionIndex = new Map();
@@ -208,7 +252,9 @@ function App() {
         map.fitBounds(regionOverlay.getBounds(), { padding: [18, 18], maxZoom: 6 });
         setMapRegionsReady(true);
       })
-      .catch((error) => { if (!disposed) console.error('Carte régionale :', error); });
+      .catch((error) => {
+        if (!disposed) logApp('error', 'Regional map could not be initialized', { reason: error.message });
+      });
     return () => { disposed = true; stopNarration(); map.remove(); leafletMap.current = null; regionLayers.current = new Map(); localityMarker.current = null; };
   }, []);
 
