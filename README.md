@@ -43,16 +43,3 @@ npm ci
 cp .env.production .env.local
 npm run dev
 ```
-
-Sur Windows PowerShell, créer ou modifier `.env.local` avec :
-
-
-
-Les fichiers commençant par `.env` sont ignorés par Git. Les variables préfixées `VITE_` sont visibles dans le navigateur et ne doivent contenir aucun secret.
-
-```
-
-
-
-
-
