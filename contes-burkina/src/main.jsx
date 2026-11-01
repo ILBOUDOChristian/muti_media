@@ -133,6 +133,26 @@ function App() {
   const [contributionSent, setContributionSent] = useState(false);
   const [contributionSaving, setContributionSaving] = useState(false);
   const [contributionError, setContributionError] = useState('');
+  const [scrollProgress, setScrollProgress] = useState(0);
+
+  useEffect(() => {
+    let frameId = 0;
+    const updateScrollProgress = () => {
+      cancelAnimationFrame(frameId);
+      frameId = requestAnimationFrame(() => {
+        const scrollable = document.documentElement.scrollHeight - window.innerHeight;
+        setScrollProgress(scrollable > 0 ? Math.min(100, Math.max(0, (window.scrollY / scrollable) * 100)) : 0);
+      });
+    };
+    updateScrollProgress();
+    window.addEventListener('scroll', updateScrollProgress, { passive: true });
+    window.addEventListener('resize', updateScrollProgress);
+    return () => {
+      cancelAnimationFrame(frameId);
+      window.removeEventListener('scroll', updateScrollProgress);
+      window.removeEventListener('resize', updateScrollProgress);
+    };
+  }, []);
 
   const stopNarration = () => {
     if ('speechSynthesis' in window) window.speechSynthesis.cancel();
@@ -312,6 +332,10 @@ function App() {
 
   return (
     <div className="app-shell">
+      <div className="scroll-progress" role="progressbar" aria-label="Progression de la lecture" aria-valuemin="0" aria-valuemax="100" aria-valuenow={Math.round(scrollProgress)}>
+        <span className="scroll-progress__track"><i style={{ height: `${scrollProgress}%` }} /></span>
+        <strong>{String(Math.round(scrollProgress)).padStart(2, '0')}<small>%</small></strong>
+      </div>
       <header className="topbar">
         <a className="brand" href="#accueil" aria-label="Les Voix du Faso, accueil">
           <span className="brand-mark"><Sparkles size={17} aria-hidden="true" /></span><span>Les Voix du <strong>Faso</strong></span>
@@ -454,7 +478,48 @@ function App() {
               <ChevronDown size={15} aria-hidden="true" />
             </div>
           </div>
-          <div className="story-grid">{filteredStories.map((story) => <button className="story-card" type="button" key={story.id} onClick={() => { selectStory(story); document.querySelector('#explorer')?.scrollIntoView({ behavior: 'smooth' }); }} aria-label={`Découvrir ${story.title}`}><img className="card-image" src={story.image} alt={`Visuel transmis pour le récit en ${story.language}`} loading="lazy" onError={(event) => { event.currentTarget.remove(); }} /><div className="card-content">{story.catalogue && <small className="catalogue-label">{story.catalogue}</small>}<div className="story-tags"><span>{story.type}</span><span>{story.language}</span></div><h3>{story.title}</h3>{(story.region || story.duration) && <p>{story.region}{story.duration && <> <span>·</span> {story.duration}</>}</p>}</div><ArrowUpRight className="card-arrow" size={18} aria-hidden="true" /></button>)}</div>
+          <div className="story-grid">
+            {filteredStories.map((story) => (
+              <button
+                className={`story-card story-card--${story.id}`}
+                type="button"
+                key={story.id}
+                onClick={() => { selectStory(story); document.querySelector('#explorer')?.scrollIntoView({ behavior: 'smooth' }); }}
+                aria-label={`Découvrir ${story.title}`}
+                onPointerMove={(event) => {
+                  if (event.pointerType === 'touch') return;
+                  const rect = event.currentTarget.getBoundingClientRect();
+                  const x = (event.clientX - rect.left) / rect.width;
+                  const y = (event.clientY - rect.top) / rect.height;
+                  event.currentTarget.style.setProperty('--story-rx', `${(0.5 - y) * 7}deg`);
+                  event.currentTarget.style.setProperty('--story-ry', `${(x - 0.5) * 9}deg`);
+                  event.currentTarget.style.setProperty('--story-light-x', `${x * 100}%`);
+                  event.currentTarget.style.setProperty('--story-light-y', `${y * 100}%`);
+                }}
+                onPointerLeave={(event) => {
+                  event.currentTarget.style.setProperty('--story-rx', '0deg');
+                  event.currentTarget.style.setProperty('--story-ry', '0deg');
+                  event.currentTarget.style.setProperty('--story-light-x', '50%');
+                  event.currentTarget.style.setProperty('--story-light-y', '50%');
+                }}
+              >
+                <span className="story-animation">
+                  <img className="card-image" src={story.image} alt={`Illustration animée du récit en ${story.language}`} loading="lazy" onError={(event) => { event.currentTarget.remove(); }} />
+                  <span className="story-animation__veil" aria-hidden="true" />
+                  <span className="story-animation__grain" aria-hidden="true" />
+                  <span className="story-animation__horizon" aria-hidden="true" />
+                  <span className="story-animation__cursor-light" aria-hidden="true" />
+                </span>
+                <div className="card-content">
+                  {story.catalogue && <small className="catalogue-label">{story.catalogue}</small>}
+                  <div className="story-tags"><span>{story.type}</span><span>{story.language}</span></div>
+                  <h3>{story.title}</h3>
+                  {(story.region || story.duration) && <p>{story.region}{story.duration && <> <span>·</span> {story.duration}</>}</p>}
+                </div>
+                <ArrowUpRight className="card-arrow" size={18} aria-hidden="true" />
+              </button>
+            ))}
+          </div>
           {filteredStories.length === 0 && <p className="empty-state">Aucun récit ne correspond à votre recherche.</p>}
         </section>
       </main>
