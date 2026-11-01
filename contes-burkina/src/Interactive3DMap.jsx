@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
-import { Sun, Sunset, Moon, Compass, MapPin } from 'lucide-react';
+import { Sun, Sunset, Moon, MapPin } from 'lucide-react';
 
 const REGION_COLORS = {
   'Sahel': '#efc44b',
@@ -637,16 +637,6 @@ export default function Interactive3DMap({ onSelectStoryRegion, activeRegionName
         display: 'flex', justifyContent: 'space-between', alignItems: 'center',
         pointerEvents: 'none', zIndex: 4, flexWrap: 'wrap', gap: '8px'
       }}>
-        <div style={{
-          background: 'rgba(22, 14, 10, 0.92)', backdropFilter: 'blur(8px)',
-          padding: '6px 14px', borderRadius: '4px', border: '1px solid rgba(221,160,71,0.4)',
-          color: '#f8f4ec', fontSize: '12px', fontWeight: 600,
-          display: 'flex', alignItems: 'center', gap: '8px',
-        }}>
-          <Compass size={15} color="#ff7b47" aria-hidden="true" />
-          <span>Burkina Faso · Village vivant</span>
-        </div>
-
         {/* Boutons lumière */}
         <div style={{ display: 'flex', gap: '5px', pointerEvents: 'auto' }}>
           {[
