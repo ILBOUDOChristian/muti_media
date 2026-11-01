@@ -133,27 +133,6 @@ function App() {
   const [contributionSent, setContributionSent] = useState(false);
   const [contributionSaving, setContributionSaving] = useState(false);
   const [contributionError, setContributionError] = useState('');
-  const [scrollProgress, setScrollProgress] = useState(0);
-
-  useEffect(() => {
-    let frameId = 0;
-    const updateScrollProgress = () => {
-      cancelAnimationFrame(frameId);
-      frameId = requestAnimationFrame(() => {
-        const scrollable = document.documentElement.scrollHeight - window.innerHeight;
-        setScrollProgress(scrollable > 0 ? Math.min(100, Math.max(0, (window.scrollY / scrollable) * 100)) : 0);
-      });
-    };
-    updateScrollProgress();
-    window.addEventListener('scroll', updateScrollProgress, { passive: true });
-    window.addEventListener('resize', updateScrollProgress);
-    return () => {
-      cancelAnimationFrame(frameId);
-      window.removeEventListener('scroll', updateScrollProgress);
-      window.removeEventListener('resize', updateScrollProgress);
-    };
-  }, []);
-
   const stopNarration = () => {
     if ('speechSynthesis' in window) window.speechSynthesis.cancel();
     setPlaying(false);
@@ -332,10 +311,6 @@ function App() {
 
   return (
     <div className="app-shell">
-      <div className="scroll-progress" role="progressbar" aria-label="Progression de la lecture" aria-valuemin="0" aria-valuemax="100" aria-valuenow={Math.round(scrollProgress)}>
-        <span className="scroll-progress__track"><i style={{ height: `${scrollProgress}%` }} /></span>
-        <strong>{String(Math.round(scrollProgress)).padStart(2, '0')}<small>%</small></strong>
-      </div>
       <header className="topbar">
         <a className="brand" href="#accueil" aria-label="Les Voix du Faso, accueil">
           <span className="brand-mark"><Sparkles size={17} aria-hidden="true" /></span><span>Les Voix du <strong>Faso</strong></span>
