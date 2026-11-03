@@ -1,0 +1,94 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -40 800 540" width="100%" height="100%">
+  <defs>
+    <linearGradient id="cascadeSky" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#182329"/>
+      <stop offset="45%" stop-color="#2d5257"/>
+      <stop offset="85%" stop-color="#5a8b7c"/>
+      <stop offset="100%" stop-color="#dcebe1"/>
+    </linearGradient>
+    <linearGradient id="domeSandstone" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#733821"/>
+      <stop offset="35%" stop-color="#a65431"/>
+      <stop offset="70%" stop-color="#cf7742"/>
+      <stop offset="100%" stop-color="#7c371f"/>
+    </linearGradient>
+    <linearGradient id="waterFall" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#eaf9f6"/>
+      <stop offset="40%" stop-color="#9ce6da"/>
+      <stop offset="100%" stop-color="#36a394"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Ciel verdoyant et brumeux des Cascades -->
+  <rect width="800" height="500" fill="url(#cascadeSky)"/>
+
+  <!-- Falaise de grÃ¨s en arriÃ¨re-plan -->
+  <path d="M0,280 Q250,220 500,260 T800,240 L800,500 L0,500 Z" fill="#3b2016" opacity="0.8"/>
+
+  <!-- DÃ´mes gÃ©ologiques de FabÃ©dougou (strates en galettes empilÃ©es) -->
+  <!-- DÃ´me 1 (Grand dÃ´me central) -->
+  <g transform="translate(190, 180)">
+    <!-- Base large -->
+    <ellipse cx="80" cy="180" rx="90" ry="24" fill="url(#domeSandstone)"/>
+    <ellipse cx="80" cy="176" rx="90" ry="24" fill="#a85734"/>
+    <!-- Strate 2 -->
+    <ellipse cx="80" cy="150" rx="80" ry="21" fill="url(#domeSandstone)"/>
+    <ellipse cx="80" cy="146" rx="80" ry="21" fill="#b9623b"/>
+    <!-- Strate 3 -->
+    <ellipse cx="80" cy="122" rx="70" ry="18" fill="url(#domeSandstone)"/>
+    <ellipse cx="80" cy="119" rx="70" ry="18" fill="#a85734"/>
+    <!-- Strate 4 -->
+    <ellipse cx="80" cy="96" rx="58" ry="15" fill="url(#domeSandstone)"/>
+    <ellipse cx="80" cy="93" rx="58" ry="15" fill="#cb7445"/>
+    <!-- Strate 5 -->
+    <ellipse cx="80" cy="72" rx="46" ry="12" fill="url(#domeSandstone)"/>
+    <ellipse cx="80" cy="70" rx="46" ry="12" fill="#b9623b"/>
+    <!-- Sommet conique du dÃ´me -->
+    <ellipse cx="80" cy="50" rx="32" ry="9" fill="#e08654"/>
+    <path d="M60,50 Q80,25 100,50 Z" fill="#cb7445"/>
+  </g>
+
+  <!-- DÃ´me 2 (DÃ´me secondaire Ã  gauche) -->
+  <g transform="translate(70, 230) scale(0.72)">
+    <ellipse cx="70" cy="160" rx="75" ry="20" fill="url(#domeSandstone)"/>
+    <ellipse cx="70" cy="132" rx="65" ry="17" fill="#b9623b"/>
+    <ellipse cx="70" cy="106" rx="54" ry="14" fill="#cb7445"/>
+    <ellipse cx="70" cy="82" rx="42" ry="11" fill="#b9623b"/>
+    <ellipse cx="70" cy="62" rx="28" ry="8" fill="#e08654"/>
+  </g>
+
+  <!-- Chutes d'eau de KarfiguÃ©la dÃ©valant les gradins rocheux -->
+  <g transform="translate(480, 210)">
+    <!-- Plateaux rocheux oÃ¹ glisse la chute -->
+    <path d="M0,70 L240,65 L220,110 L-20,115 Z" fill="#29160f"/>
+    <path d="M10,130 L220,125 L200,170 L-10,175 Z" fill="#20110b"/>
+    <path d="M-10,190 L200,185 L180,240 L-30,245 Z" fill="#180c07"/>
+
+    <!-- Voiles de cascade scintillante -->
+    <!-- Chute supÃ©rieure -->
+    <path d="M30,30 L80,30 L95,75 L20,75 Z" fill="url(#waterFall)" opacity="0.9"/>
+    <path d="M120,25 L160,25 L175,70 L110,70 Z" fill="url(#waterFall)" opacity="0.85"/>
+    <!-- Chute intermÃ©diaire -->
+    <path d="M15,75 L185,70 L195,130 L5,130 Z" fill="url(#waterFall)" opacity="0.92"/>
+    <!-- Chute infÃ©rieure avec Ã©claboussures et Ã©cume -->
+    <path d="M-5,130 L205,125 L215,200 L-15,200 Z" fill="url(#waterFall)" opacity="0.95"/>
+
+    <!-- Ã‰cume et brume d'eau en bas des chutes -->
+    <ellipse cx="100" cy="205" rx="130" ry="24" fill="#ffffff" opacity="0.6"/>
+    <ellipse cx="100" cy="210" rx="90" ry="18" fill="#c4f4ec" opacity="0.5"/>
+  </g>
+
+  <!-- Manguiers et vÃ©gÃ©tation luxuriante en bordure de ComoÃ© -->
+  <ellipse cx="50" cy="420" rx="60" ry="25" fill="#1b4226"/>
+  <ellipse cx="760" cy="410" rx="70" ry="28" fill="#163820"/>
+  <ellipse cx="430" cy="445" rx="50" ry="20" fill="#1d4829"/>
+
+  <!-- Bassin d'eau turquoise au premier plan -->
+  <ellipse cx="400" cy="465" rx="390" ry="50" fill="#236e65"/>
+  <ellipse cx="400" cy="465" rx="320" ry="35" fill="#389488" opacity="0.45"/>
+
+  <!-- Titre et sous-titre gravÃ©s -->
+  <text x="50" y="70" font-family="'Playfair Display', Georgia, serif" font-size="28" font-weight="600" fill="#eaf7f3" letter-spacing="2">DÔMES &amp; CHUTES DE KARFIGUÉLA</text>
+  <text x="50" y="95" font-family="'DM Sans', sans-serif" font-size="12" font-weight="700" fill="#78ddcc" letter-spacing="4">SANCTUAIRE DES EAUX DE BANFORA · CASCADES</text>
+</svg>
+

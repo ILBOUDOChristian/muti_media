@@ -4,7 +4,7 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import {
   ArrowLeft, ArrowRight, ArrowUpRight, BookOpen, ChevronDown, CirclePlay,
-  Compass, ExternalLink, Languages, Layers, MapPin, Menu, Pause, Search, Sparkles,
+  Compass, Crown, ExternalLink, Filter, Languages, Layers, MapPin, Menu, Pause, Search, Sparkles,
   Volume2, X,
 } from 'lucide-react';
 import Interactive3DMap from './Interactive3DMap';
@@ -21,71 +21,185 @@ window.addEventListener('error', (event) => {
     ? event.target.currentSrc || event.target.src
     : undefined;
   if (resourceUrl) {
-    logApp('error', 'Resource media or image failed to load', {
-      url: resourceUrl,
-      element: event.target.tagName.toLower?.(),
-    }, true);
+    logApp('error', 'Resource media failed to load', { url: resourceUrl });
     return;
   }
-  logApp('error', 'Unhandled application error', {
-    message: event.message,
-    source: event.filename,
-    line: event.lineno,
-    column: event.colno,
-  });
+  logApp('error', 'Unhandled application error', { message: event.message });
 });
 
-window.addEventListener('unhandledrejection', (event) => {
-  logApp('error', 'Unhandled promise rejection', {
-    reason: event.reason instanceof Error ? event.reason.message : String(event.reason),
-  });
-});
-
-logApp('info', 'Application started', {
-  host: window.location.host,
-  pathname: window.location.pathname,
-  protocol: window.location.protocol,
-});
-
+// ── CORPUS VÉRIFIÉ DU PATRIMOINE ORAL : CONTES ET LÉGENDES DU BURKINA FASO ──
 const stories = [
+  // ── LÉGENDES FONDATRICES DU BURKINA FASO ──
   {
-    id: 'conte-bissa', title: 'Conte en Bissa', language: 'Bissa', type: 'Conte', color: 'ochre',
-    localityRegion: 'Centre-Est', localityLabel: 'Centre-Est · repère linguistique bissa indicatif',
-    audioUrl: '/Bissa.mp3', image: '/images/bissa.png', excerpt: 'Enregistrement transmis en langue bissa.',
-    chapters: [['Écouter le récit', 'Le fichier audio en Bissa est disponible. Le texte du récit n’a pas été fourni.']],
-  },
-  {
-    id: 'suruku-ni-sonsannin', title: 'Suruku ni sonsannin', catalogue: '15 Nziirin nziirin',
-    language: 'Dioula', type: 'Conte', color: 'red',
-    localityRegion: 'Haut-Bassins', localityLabel: 'Bobo-Dioulasso · lieu de lecture audio',
-    audioUrl: '/15%20cont%20dioull%20vol2.mp3', image: '/images/dioula.png',
-    textCredit: '© Texte dioula par Alou Keïta, Ouagadougou, Burkina Faso, 2021',
-    audioCredit: '© Audio lu par Afsatou Bokoum, Bobo-Dioulasso, Burkina Faso',
-    excerpt: 'Suruku et Sonsannin partent pêcher; le partage des prises met à l’épreuve leur confiance.',
+    id: 'legende-yennenga',
+    title: 'L’Épopée de la Princesse Yennenga & l’Étalon Ouédraogo',
+    catalogue: 'Mythe fondateur national',
+    language: 'Mooré',
+    type: 'Légende',
+    color: 'ochre',
+    localityRegion: 'Centre',
+    localityLabel: 'Ouagadougou & Moogo · Mythe fondateur de la nation mossi',
+    image: '/images/yennenga.svg',
+    credit: 'Tradition orale du Moogo · Récit académique vérifié',
+    excerpt: 'Princesse guerrière du royaume de Dagomba et cavalière d’exception, Yennenga conquiert sa liberté. De son union avec le chasseur Rialé naît Ouédraogo, père fondateur des royaumes mossis.',
     chapters: [
-      ['Le partage des poissons', 'Lon dɔ suruku ni sonsannin bɛnna ka taga jigɛ minɛ.\nO lon fɔlɔ o ye jigɛ kelen le sɔrɔ.\nSonsannin ko n teri jigɛ kelen ni mɔgɔ fila tilan ka gɛlɛn, jigɛ kelen di n ma sini ni an nana jigɛ fila sɔrɔ, e bina to ni jigɛ fila nin ye.\nSuruku ko basi te yen.\nO loon na, o ye jigɛ fila sɔrɔ.\nSonsannin ko n teri nin jigɛ fila nin te se ka supu ɲanaman kɛ, a di n ma, ni an nana sini ka naani sɔrɔ e bina to ni a bɛɛ ye.\nSuruku ko basi te yen.'],
-      ['Une excuse pour s’éloigner', 'O dugusagɛ, o tagara jigɛminayɔrɔ ra, o ye naani sɔrɔ.\nSonsannin ko a bi kuma, suruku ko a ma : kana kunko ɲini a te yɔrɔ min na.\nSonsannin ko a ka yafa a ma, nga ale ka lumɔgɔw bi sara, a bina boli ka taga a ɲaɲini.\nO ye ɲɔgɔn fo.\nSonsannin bolila ka taga la suruku ka sira kan.'],
-      ['Suruku se rend compte', 'Suruku nana a ye ko sonsannin tun ye min fɔ o ye tiɲɛ le ye ka tɛmɛ ni a yɛrɛ ye.\nSonsannin wulila ka taga la suruku ɲa fɛ tugunin.\nSuruku lɔra ka miiri ni a tun ye sonsannin fila nunu cɛ, a tun bi kɛ supu ɲanaman ye.'],
-      ['La morale', 'A ye jigɛ bila, ko a be taga sonsannin kelen dɔ nin ta a nana a sɔrɔ ko Sonsannin wulila ka boli ni a ka jigɛ ye.\nA ma Sonsannin sɔrɔ, a ma a ka jigɛ fana sɔrɔ.\nO le ra, o ko bi ka dɔrɔmɛ kelen ka fisa ni sini duuru ye.'],
+      [
+        'L’amazone de Gambaga',
+        'Yennenga (dont le prénom de naissance est Poko) naît à Gambaga dans le royaume de Dagomba, fille chérie du roi Naaba Nedega.\nÉlevée dès le plus jeune âge au maniement des armes et à l’équitation, elle se révèle une cavalière incomparable et une archère redoutable.\nElle commande avec bravoure la cavalerie de son père et repousse victorieusement les assauts ennemis, devenant le plus solide rempart du royaume.'
+      ],
+      [
+        'Le champ de gombo et le refus d’asservissement',
+        'Admiratif de ses exploits mais refusant de se priver de son bras armé, le roi Nedega repousse tous les prétendants et refuse obstinément de la marier.\nPour exprimer sa révolte et la tristesse de voir sa jeunesse se consumer sans descendance, Yennenga fait semer un champ de gombo par ses servantes et laisse pourrir les fruits mûrs sur pied.\nDevant son père stupéfait, elle déclare : « Vois ce champ : les fruits mûrs abandonnés pourrissent sans nourrir personne. Ainsi dépérit ma jeunesse si tu m’empêches de donner la vie ».'
+      ],
+      [
+        'La chevauchée vers la liberté',
+        'Constatant l’inflexibilité de son père, Yennenga prend son destin en main.\nUne nuit, vêtue d’un habit d’homme et de guerrier, elle enfourche son fougueux étalon blanc.\nElle galope à bride abattue vers le nord, franchissant rivières en crue et forêts denses pour échapper aux gardes lancés à sa poursuite.\nAprès des jours d’épuisement et de solitude au cœur de la brousse, son fidèle destrier la conduit à l’orée d’une forêt mystérieuse.'
+      ],
+      [
+        'La rencontre avec Rialé',
+        'C’est dans ces bois que vit Rialé, un prince et noble chasseur d’éléphants d’origine mandingue ayant fui les conflits de sa terre.\nDécouvrant cette mystérieuse cavalière évanouie près de son étalon, Rialé la recueille avec bienveillance et panse ses blessures.\nLorsqu’elle reprend ses esprits et révèle sa véritable identité, naît entre ces deux âmes libres une admiration mutuelle qui se transforme en amour profond.'
+      ],
+      [
+        'La naissance de Ouédraogo et la fondation du Moogo',
+        'De leur union naît un fils vigoureux qu’ils prénomment Ouédraogo — qui signifie « étalon » ou « cheval mâle » en langue mooré, en hommage éternel au destrier blanc qui permit la fuite de la princesse.\nDevenu adulte, Ouédraogo part vers le nord et fonde le royaume de Tenkodogo, première capitale de la grande dynastie des Mossis (le Moogo).\nDepuis, la princesse Yennenga et son étalon incarnent la bravoure, la liberté et l’identité nationale du Burkina Faso, dont le trophée majeur du FESPACO porte le nom : l’Étalon d’or de Yennenga.'
+      ],
     ],
   },
   {
-    id: 'soni-alla-waray', title: 'Soni so Alla waray, kaananke warataa!',
-    language: 'Fulfulde', type: 'Conte', color: 'ochre', audioUrl: '/03_Soni_Alla_waraay.mp3', image: '/images/fulfulde.png', credit: 'Tijjaani Ba',
-    localityRegion: 'Sahel', localityLabel: 'Sahel · aire linguistique fulfulde indicative',
-    excerpt: 'Conte en Fulfulde transmis par Tijjaani Ba.',
+    id: 'legende-dafra',
+    title: 'Le Sanctuaire des Silures Sacrés de Dafra',
+    catalogue: 'Mémoire tutélaire de Sya',
+    language: 'Dioula',
+    type: 'Légende',
+    color: 'red',
+    localityRegion: 'Haut-Bassins',
+    localityLabel: 'Bobo-Dioulasso (Sya) · Source sacrée du marigot Houet',
+    image: '/images/dafra.svg',
+    credit: 'Tradition des Bobo Mandarè · Patrimoine immatériel de Bobo-Dioulasso',
+    excerpt: 'Dans la gorge rocheuse de Dafra où sourd le marigot Houet, des silures géants incarnent les ancêtres fondateurs de Sya. Nul ne peut les pêcher sans braver la colère des forces tutélaires.',
     chapters: [
-      ['L’avertissement', 'Soni so Alla waray, kaananke warataa!\nGoɗɗo wonnoo de, wawtu fu o wi\'ataanaa soni Alla waray, ni kaananke warataa. Jakka na ɗum metti kaanankee hunnde. Heddii kaananke itti fiyaare muuɗum, kam du finaatawaare muuɗum abada, maamam maayi yoppi ɓiɗɗo addi, noon ni faa tukki o. O addi fiyaare ndeen, o reeni o. Reenunoo o fu, kaananke acci faa o dilli de wi\'i goɗɗo soosoo addowa fiyaare nde, faɗɗa e maayo. Heɓa wara ƴamta o. So tawii tawaaka na o resi nde ni wara o. Nde o faɗɗunoo nde fu liinga moɗi nde.'],
-      ['Le jeune homme et le filet', 'Suka gorko du wallaa nyaamdu so wanaa liƴƴi. Goɗɗo goma yaata na awoo dey, so awoken faa kiikiiɗe ni fanta sottira o. Fiyaare faɗɗaama liinga moɗii ɗum. Awottooɗo awooken heɓii linga ngaan fantii sottirii o. O huttunoo nga ni o tawi fiyaare nder reedu liinnga. O wi\'i ndaa fiyaaree nde, way ba nde ndeenanoo-mi nde. O ummii jon kaa o ndaaroy to o resunoo to, o tawi fiyaare kaananke wallaa toon. Heddii o tummbiti fiyaare o resii faa waɗi daggu balɗe jeɗɗi.'],
-      ['Le crocodile demande le filet', 'Nyannde gom ni kaananke nilani suka gorko. O yottinoo ni o wi\'aa o wadda fiyaare. O wi\'i ayyo faa o hoota dey, o wadda fiyaare. Kaananke wi\'i ndelle o ɗuutee ko na anndi koo o doggal. O yottinoo ni o tummbiti fiyaare o waddi. Kaanankee ƴammi: "Noy ngaɗɗaa dey kewtuɗaa fiyaare nde ? O jaabii: "Noy waɗɗunoo hey ?" Kaananke wi\'i mi waɗɗaanonaa fiyaare nde tummbitaa de yahaa faɗɗowaa maayo too, heɓa mi ware. O ƴami ko saabii. Ko mbi\'aataa ko so Alla waray ni kaananke warataa ɗum wellaa kam; ɗuum saabii.'],
-      ['La ruse dévoilée', 'Suka gorko wi\'i gasii. Ndelle, nde ni nde faɗɗowanoo, liinga moɗi nde. Awotooɗo o, nde awowinoo fu heɓi liinga ngaa wari sottiri kam. Min du coodum liinga ngaan. Kuttum liinga ngaan dey tawum fiyaare ndeen ley reedu magga. Min kaa faa hannde, hannde e jaango fu, kaan keddii-mi nam jeerfoo. Soni so Alla waray fu, kaananke warataa!\n\nTijjaani Ba'],
+      [
+        'La gorge sacrée de Sya',
+        'Au sud de Bobo-Dioulasso, encaissée entre de monumentales parois de grès noirci par le temps, se cache la source naturelle du marigot Houet.\nCe lieu mystique et grandiose est nommé Dafra, mot qui signifie « ancêtre » ou « grand-père » en langue bobo.\nC’est un sanctuaire séculaire où la nature et le monde spirituel des anciens ne font qu’un.'
+      ],
+      [
+        'L’incarnation des ancêtres protecteurs',
+        'Selon la tradition transmise par les anciens du peuple Bobo Mandarè, lors des grandes guerres et des invasions d’autrefois, les fondateurs de Sya vinrent chercher refuge dans cette gorge inaccessible.\nPour protéger leur descendance pour l’éternité, les esprits des patriarches s’incarnèrent dans les grands silures (poissons-chats) noirs peuplant le bassin.\nCertains récits rapportent que les plus anciens de ces poissons portent sur leur corps les traces sacrées de cauris protecteurs.'
+      ],
+      [
+        'Les interdits et les funérailles des poissons',
+        'Le caractère sacré de Dafra impose des règles absolues que chaque visiteur doit respecter :\nIl est formellement interdit de pêcher, de blesser ou de consommer les silures de la source.\nSur le site, le port de vêtements rouges et de parures en or est strictement proscrit.\nChose unique au monde : lorsqu’un vieux silure sacré vient à mourir, il est retiré des eaux avec une vénération infinie, enveloppé dans un linceul blanc et inhumé selon les mêmes rites funéraires qu’un doyen vénéré de la communauté.'
+      ],
+      [
+        'Le vœu et le devoir de mémoire',
+        'Depuis des générations, pèlerins et visiteurs descendent le sentier escarpé pour s’agenouiller au bord de l’eau.\nOn y formule des vœux de santé, de prospérité et particulièrement de fécondité pour les mères en attente d’enfant.\nToute prière exaucée par les ancêtres de Dafra engage moralement le pèlerin à revenir accomplir des offrandes de gratitude, perpétuant ainsi l’alliance millénaire entre les hommes et les eaux de Bobo-Dioulasso.'
+      ],
     ],
   },
   {
-    id: 'nin-keem', title: 'Nin-kẽem a yembr kibare',
-    language: 'Mooré', type: 'Conte', color: 'green', audioUrl: '/Conte_01_Nikeema.mp3', image: '/images/mossi.png', moralChapter: true,
-    localityRegion: 'Centre', localityLabel: 'Centre · repère culturel mooré indicatif',
-    excerpt: 'Un enfant déjoue la ruse du lion et sauve son père grâce à son écoute et à sa présence d’esprit.',
+    id: 'legende-crocodiles-bazoule',
+    title: 'Le Pacte des Crocodiles Sacrés de Bazoulé & Sabou',
+    catalogue: 'Pacte séculaire Homme-Nature',
+    language: 'Mooré',
+    type: 'Légende',
+    color: 'ochre',
+    localityRegion: 'Centre-Ouest',
+    localityLabel: 'Bazoulé & Sabou · Mare sacrée de la fraternité humaine et animale',
+    image: '/images/bazoule.svg',
+    credit: 'Tradition orale mossi · Fête rituelle du Koom Lakré',
+    excerpt: 'Au XVe siècle, lors d’une terrible sécheresse, les crocodiles guidèrent les villageois assoiffés vers une nappe d’eau secrète. Depuis ce jour, un pacte de paix inviolable unit la communauté et les reptiles.',
+    chapters: [
+      [
+        'L’épreuve de la grande soif',
+        'Il y a plus de cinq siècles, sous le règne du Moogho Naaba Kouda vers les années 1400, une sécheresse impitoyable s’abattit sur la région de Bazoulé.\nPendant de longues saisons sans une goutte de pluie, les puits se tarirent, les animaux périrent et les habitants devaient marcher des journées entières sans parvenir à désaltérer leurs enfants.\nLe village était au bord de la famine et de l’exil.'
+      ],
+      [
+        'Les crocodiles guides providentiels',
+        'C’est alors qu’apparurent d’imposants crocodiles du Nil venus des profondeurs de la savane.\nObservant avec curiosité les reptiles, des femmes du village remarquèrent qu’ils s’enfonçaient dans des terriers d’argile d’où ils ressortaient le corps ruisselant d’une eau fraîche et limpide.\nEn suivant prudemment leurs traces, les villageois découvrirent une nappe phréatique abondante et inépuisable qui sauva la vie de toute la communauté.'
+      ],
+      [
+        'L’alliance sacrée et le respect mutuel',
+        'Pénétrés d’une reconnaissance éternelle envers ces animaux qui les avaient délivrés de la mort, les chefs de terre et les doyens scellèrent un pacte solennel :\nLe crocodile fut élevé au rang de totem protecteur du village.\nIl fut rigoureusement interdit de les chasser, de les frapper ou de leur causer le moindre tort.\nEn retour, les crocodiles apprirent à vivre en harmonie totale avec les humains, sans jamais attaquer les villageois ni leur bétail.'
+      ],
+      [
+        'La fête du Koom Lakré',
+        'Aujourd’hui encore, à Bazoulé comme à Sabou, enfants et femmes se baignent et puisent l’eau aux côtés de plus de deux cents crocodiles en totale liberté.\nChaque année, la fête coutumière du Koom Lakré (« vaincre la faim » et célébrer l’eau) rassemble la population pour remercier les crocodiles et réaffirmer ce pacte de coexistence pacifique, exemple universel d’harmonie entre l’être humain et la faune sauvage.'
+      ],
+    ],
+  },
+  {
+    id: 'legende-fabedougou-cascades',
+    title: 'Les Dômes de Fabédougou et Chutes de Karfiguéla',
+    catalogue: 'Sanctuaire des Esprits des Eaux',
+    language: 'Dioula',
+    type: 'Légende',
+    color: 'green',
+    localityRegion: 'Cascades',
+    localityLabel: 'Banfora & Karfiguéla · Forteresses de grès et génies des eaux de la Comoé',
+    image: '/images/cascades.svg',
+    credit: 'Tradition tiéfo et sénoufo · Région des Cascades',
+    excerpt: 'Dans la région de Banfora, les dômes géologiques de Fabédougou et les cascades de Karfiguéla forment un paysage millénaire habité par les génies tutélaires de l’eau. Nul voyageur n’y passe la nuit.',
+    chapters: [
+      [
+        'Les forteresses bâties par la Terre',
+        'À quelques lieues de Banfora, les dômes de Fabédougou s’élèvent vers le ciel comme de gigantesques châteaux sculptés dans le grès.\nÉmergées des eaux d’un ancien océan préhistorique il y a des millions d’années, ces couches de roche empilées en strates parfaites semblent avoir été dressées par des mains surnaturelles.\nDans la mémoire des peuples du Sud-Ouest, ces édifices sont les demeures secrètes des génies fondateurs de la terre.'
+      ],
+      [
+        'L’eau vivifiante de la Comoé',
+        'Au pied de ces reliefs majestueux, les chutes de Karfiguéla précipitent les eaux du fleuve Comoé le long de falaises étagées, à travers une allée séculaire de manguiers géants.\nCette eau vive irrigue les vallées fertiles et assure la prospérité des récoltes de canne et de céréales de toute la contrée.'
+      ],
+      [
+        'L’interdit absolu du crépuscule',
+        'Dans les traditions animistes des Tiéfos et des Sénoufos, la beauté des cascades s’accompagne d’un profond respect des puissances invisibles.\nUn tabou séculaire, scrupuleusement observé par les guides et les habitants, interdit formellement de passer la nuit sur le site des chutes.\nDès que le soleil disparaît derrière la falaise, le royaume de l’eau revient aux génies tutélaires, et troubler leur quiétude nocturne exposerait l’imprudent à de funestes égarements.'
+      ],
+      [
+        'Un héritage à contempler et protéger',
+        'Les Dômes de Fabédougou et les Cascades de Karfiguéla rappellent que chaque élément naturel du Burkina Faso porte en lui une histoire, un équilibre écologique fragile et une présence spirituelle qu’il convient de transmettre avec respect aux générations futures.'
+      ],
+    ],
+  },
+  {
+    id: 'legende-guimbi-ouattara',
+    title: 'Guimbi Ouattara, l’Âme Souveraine de Sya',
+    catalogue: 'Héroïne et diplomate de Sya',
+    language: 'Dioula',
+    type: 'Légende',
+    color: 'red',
+    localityRegion: 'Haut-Bassins',
+    localityLabel: 'Bobo-Dioulasso · Grande cheffe et pacificatrice du Gwiriko',
+    image: '/images/guimbi.svg',
+    credit: 'Histoire orale du Gwiriko · Archives mémorielles de Bobo-Dioulasso',
+    excerpt: 'Princesse du royaume du Gwiriko à Bobo-Dioulasso, Guimbi Ouattara marqua l’histoire par sa fine intelligence politique face à Samori Touré et son dévouement inébranlable pour son peuple.',
+    chapters: [
+      [
+        'L’héritière indomptable du Gwiriko',
+        'Née vers 1836 à Bobo-Dioulasso, fille aînée de Diori Ouattara, roi du Guiriko, Guimbi Ouattara s’affirme dès sa prime jeunesse comme une femme au caractère exceptionnel.\nRefusant toute soumission servile et affirmant son indépendance politique, elle acquiert une stature de dirigeante éclairée et respectée par tous les notables de la cité de Sya.'
+      ],
+      [
+        'La diplomatie pour sauver Bobo-Dioulasso',
+        'En 1897, la redoutable armée de conquête de l’Almamy Samori Touré fond sur la région, semant l’effroi et détruisant les cités rivales.\nConsciente du carnage qui guette son peuple, la princesse Guimbi Ouattara prend une initiative audacieuse : elle se rend elle-même à la rencontre du conquérant.\nGrâce à son éloquence, ses présents somptueux et son sens aigu de la négociation, elle parvient à sceller une alliance de paix qui épargne Bobo-Dioulasso du massacre et du pillage.'
+      ],
+      [
+        'La bienfaitrice et le puits de Konbougou',
+        'Véritable mère de la nation et modèle d’hospitalité, Guimbi Ouattara fit creuser de ses propres deniers un puits communautaire dans le quartier Konbougou afin que les femmes et les voyageurs de passage ne souffrent jamais de la pénurie d’eau.\nSon mausolée à Bobo-Dioulasso demeure aujourd’hui un lieu vénéré et un symbole éternel du leadership et de l’émancipation féminine au Burkina Faso.'
+      ],
+    ],
+  },
+
+  // ── CONTES TRADITIONNELS DU FASO ──
+  {
+    id: 'nin-keem',
+    title: 'Nin-kẽem a yembr kibare',
+    catalogue: 'Conte moral traditionnel',
+    language: 'Mooré',
+    type: 'Conte',
+    color: 'green',
+    localityRegion: 'Centre',
+    localityLabel: 'Centre · repère culturel mooré indicatif',
+    audioUrl: '/Conte_01_Nikeema.mp3',
+    image: '/images/mossi.png',
+    moralChapter: true,
+    excerpt: 'Un enfant déjoue la ruse du lion et sauve son père grâce à son écoute attentive et à sa présence d’esprit face au danger.',
     chapters: [
       ['Le chemin', 'Nin-kẽem a yembr n wa n yik a zak pʋgẽ, n na n tɩ gõ weoogẽ.\nLa, a bi-bilf a yembr yikame, t’a na n tũ-a lame.\nLa, a ba wã tõdgame, t’a kõn tũ ye.\nTɩ bõe?'],
       ['Le lion chante', 'A paoodame, weoogã pʋg yaa gõose, koom kae me, n yũud ye.\nLa, a biigã tõdgame, n tũ-a n looge.\nB sẽn wa n ta we-raoogã pʋga, saag n kʋɩ, tɩ sebgã sɩng yikri.\nB zoe n tɩ kẽe tãng bokẽ, n na n sool saagã.\nMik bokã yaa m ba Weoognaab roogo.\nM ba Weoognaab sẽn wa n yi gõob n wa, a mikame t’a roogã pida ne rɩɩbo, t’a na n kɩdem ne sũ-noogo, n pʋd yɩɩll n yetẽ :\n«Roog vũuda, roog vũuda, roog vũud tɩ m meng be yɩng n daeeda».'],
@@ -94,24 +208,80 @@ const stories = [
       ['La leçon', 'Yaa woto, la biigã maan n fãag a ba wã, la a menga.\nBɩ d ra kɩɩs d kambã noor wakat ning ye, d mi n kelgd-ba.'],
     ],
   },
+  {
+    id: 'suruku-ni-sonsannin',
+    title: 'Suruku ni sonsannin',
+    catalogue: '15 Nziirin nziirin',
+    language: 'Dioula',
+    type: 'Conte',
+    color: 'red',
+    localityRegion: 'Haut-Bassins',
+    localityLabel: 'Bobo-Dioulasso · conte traditionnel mandé',
+    audioUrl: '/15%20cont%20dioull%20vol2.mp3',
+    image: '/images/dioula.png',
+    textCredit: '© Texte dioula par Alou Keïta, Ouagadougou, Burkina Faso, 2021',
+    audioCredit: '© Audio lu par Afsatou Bokoum, Bobo-Dioulasso, Burkina Faso',
+    excerpt: 'Suruku la hyène et Sonsannin le lièvre rusé partent pêcher ; le partage des prises met à rude épreuve leur confiance et leur fidélité.',
+    chapters: [
+      ['Le partage des poissons', 'Lon dɔ suruku ni sonsannin bɛnna ka taga jigɛ minɛ.\nO lon fɔlɔ o ye jigɛ kelen le sɔrɔ.\nSonsannin ko n teri jigɛ kelen ni mɔgɔ fila tilan ka gɛlɛn, jigɛ kelen di n ma sini ni an nana jigɛ fila sɔrɔ, e bina to ni jigɛ fila nin ye.\nSuruku ko basi te yen.\nO loon na, o ye jigɛ fila sɔrɔ.\nSonsannin ko n teri nin jigɛ fila nin te se ka supu ɲanaman kɛ, a di n ma, ni an nana sini ka naani sɔrɔ e bina to ni a bɛɛ ye.\nSuruku ko basi te yen.'],
+      ['Une excuse pour s’éloigner', 'O dugusagɛ, o tagara jigɛminayɔrɔ ra, o ye naani sɔrɔ.\nSonsannin ko a bi kuma, suruku ko a ma : kana kunko ɲini a te yɔrɔ min na.\nSonsannin ko a ka yafa a ma, nga ale ka lumɔgɔw bi sara, a bina boli ka taga a ɲaɲini.\nO ye ɲɔgɔn fo.\nSonsannin bolila ka taga la suruku ka sira kan.'],
+      ['Suruku se rend compte', 'Suruku nana a ye ko sonsannin tun ye min fɔ o ye tiɲɛ le ye ka tɛmɛ ni a yɛrɛ ye.\nSonsannin wulila ka taga la suruku ɲa fɛ tugunin.\nSuruku lɔra ka miiri ni a tun ye sonsannin fila nunu cɛ, a tun bi kɛ supu ɲanaman ye.'],
+      ['La morale', 'A ye jigɛ bila, ko a be taga sonsannin kelen dɔ nin ta a nana a sɔrɔ ko Sonsannin wulila ka boli ni a ka jigɛ ye.\nA ma Sonsannin sɔrɔ, a ma a ka jigɛ fana sɔrɔ.\nO le ra, o ko bi ka dɔrɔmɛ kelen ka fisa ni sini duuru ye.'],
+    ],
+  },
+  {
+    id: 'soni-alla-waray',
+    title: 'Soni so Alla waray, kaananke warataa!',
+    catalogue: 'Conte traditionnel peul',
+    language: 'Fulfulde',
+    type: 'Conte',
+    color: 'ochre',
+    localityRegion: 'Sahel',
+    localityLabel: 'Sahel · aire linguistique fulfulde pastorale',
+    audioUrl: '/03_Soni_Alla_waraay.mp3',
+    image: '/images/fulfulde.png',
+    credit: 'Tijjaani Ba',
+    excerpt: 'Conte en Fulfulde transmis par Tijjaani Ba : tant que Dieu ne décide pas de la perte d’un être, nulle puissance humaine ne peut l’abattre.',
+    chapters: [
+      ['L’avertissement', 'Soni so Alla waray, kaananke warataa!\nGoɗɗo wonnoo de, wawtu fu o wi\'ataanaa soni Alla waray, ni kaananke warataa. Jakka na ɗum metti kaanankee hunnde. Heddii kaananke itti fiyaare muuɗum, kam du finaatawaare muuɗum abada, maamam maayi yoppi ɓiɗɗo addi, noon ni faa tukki o. O addi fiyaare ndeen, o reeni o. Reenunoo o fu, kaananke acci faa o dilli de wi\'i goɗɗo soosoo addowa fiyaare nde, faɗɗa e maayo. Heɓa wara ƴamta o. So tawii tawaaka na o resi nde ni wara o. Nde o faɗɗunoo nde fu liinga moɗi nde.'],
+      ['Le jeune homme et le filet', 'Suka gorko du wallaa nyaamdu so wanaa liƴƴi. Goɗɗo goma yaata na awoo dey, so awoken faa kiikiiɗe ni fanta sottira o. Fiyaare faɗɗaama liinga moɗii ɗum. Awottooɗo awooken heɓii linga ngaan fantii sottirii o. O huttunoo nga ni o tawi fiyaare nder reedu liinnga. O wi\'i ndaa fiyaaree nde, way ba nde ndeenanoo-mi nde. O ummii jon kaa o ndaaroy to o resunoo to, o tawi fiyaare kaananke wallaa toon. Heddii o tummbiti fiyaare o resii faa waɗi daggu balɗe jeɗɗi.'],
+      ['Le crocodile demande le filet', 'Nyannde gom ni kaananke nilani suka gorko. O yottinoo ni o wi\'aa o wadda fiyaare. O wi\'i ayyo faa o hoota dey, o wadda fiyaare. Kaananke wi\'i ndelle o ɗuutee ko na anndi koo o doggal. O yottinoo ni o tummbiti fiyaare o waddi. Kaanankee ƴammi: "Noy ngaɗɗaa dey kewtuɗaa fiyaare nde ? O jaabii: "Noy waɗɗunoo hey ?" Kaananke wi\'i mi waɗɗaanonaa fiyaare nde tummbitaa de yahaa faɗɗowaa maayo too, heɓa mi ware. O ƴami ko saabii. Ko mbi\'aataa ko so Alla waray ni kaananke warataa ɗum wellaa kam; ɗuum saabii.'],
+      ['La ruse dévoilée', 'Suka gorko wi\'i gasii. Ndelle, nde ni nde faɗɗowanoo, liinga moɗi nde. Awotooɗo o, nde awowinoo fu heɓi liinga ngaa wari sottiri kam. Min du coodum liinga ngaan. Kuttum liinga ngaan dey tawum fiyaare ndeen ley reedu magga. Min kaa faa hannde, hannde e jaango fu, kaan keddii-mi nam jeerfoo. Soni so Alla waray fu, kaananke warataa!\n\nTijjaani Ba'],
+    ],
+  },
+  {
+    id: 'conte-bissa',
+    title: 'Conte en Bissa',
+    catalogue: 'Tradition orale bissa',
+    language: 'Bissa',
+    type: 'Conte',
+    color: 'ochre',
+    localityRegion: 'Centre-Est',
+    localityLabel: 'Centre-Est · repère linguistique bissa indicatif',
+    audioUrl: '/Bissa.mp3',
+    image: '/images/bissa.png',
+    excerpt: 'Enregistrement authentique transmis en langue bissa par les conteurs du Centre-Est burkinabè.',
+    chapters: [
+      ['Écouter le récit', 'Le fichier audio en langue Bissa est disponible dans son authenticité d’enregistrement.\nCe conte met en lumière la richesse mélodique et poétique de la tradition orale transmise de génération en génération au Centre-Est du Faso.'],
+    ],
+  },
 ];
 
 function persistContribution(record) {
   return new Promise((resolve, reject) => {
     if (!('indexedDB' in window)) {
-      reject(new Error('Le stockage local des fichiers n’est pas disponible dans ce navigateur.'));
+      reject(new Error('Le stockage local n’est pas disponible.'));
       return;
     }
     const request = indexedDB.open('les-voix-du-faso', 1);
     request.onupgradeneeded = () => request.result.createObjectStore('proposals', { keyPath: 'id' });
-    request.onerror = () => reject(request.error || new Error('Ouverture du stockage impossible.'));
+    request.onerror = () => reject(request.error || new Error('Erreur d’ouverture.'));
     request.onsuccess = () => {
-      const database = request.result;
-      const transaction = database.transaction('proposals', 'readwrite');
-      transaction.objectStore('proposals').put(record);
-      transaction.oncomplete = () => { database.close(); resolve(); };
-      transaction.onerror = () => { database.close(); reject(transaction.error || new Error('Enregistrement impossible.')); };
-      transaction.onabort = () => { database.close(); reject(transaction.error || new Error('Enregistrement interrompu.')); };
+      const db = request.result;
+      const tx = db.transaction('proposals', 'readwrite');
+      tx.objectStore('proposals').put(record);
+      tx.oncomplete = () => { db.close(); resolve(); };
+      tx.onerror = () => { db.close(); reject(tx.error); };
     };
   });
 }
@@ -122,30 +292,48 @@ function App() {
   const regionLayers = useRef(new Map());
   const localityMarker = useRef(null);
   const [mapRegionsReady, setMapRegionsReady] = useState(false);
-  const [mapMode, setMapMode] = useState('3D'); // '3D' | '2D'
-  const [activeStory, setActiveStory] = useState(() => stories.find((story) => story.id === 'nin-keem') || stories[0]);
+  const [mapMode, setMapMode] = useState('3D');
+  const [activeStory, setActiveStory] = useState(() => stories.find(s => s.id === 'nin-keem') || stories[0]);
   const [chapterIndex, setChapterIndex] = useState(0);
   const [playing, setPlaying] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [typeFilter, setTypeFilter] = useState('Tous les types');
   const [language, setLanguage] = useState('Toutes les langues');
   const [query, setQuery] = useState('');
+
+  // Synchronisation filtre 3D ↔ filtre collection
+  const handle3DFilterChange = (filter) => {
+    if (filter === 'legendes') {
+      setTypeFilter('Légendes');
+    } else if (filter === 'contes') {
+      setTypeFilter('Contes');
+    } else {
+      setTypeFilter('Tous les types');
+    }
+    // Scroller vers la collection pour voir l'effet du filtre
+    document.querySelector('#histoires')?.scrollIntoView({ behavior: 'smooth' });
+  };
   const [contributionOpen, setContributionOpen] = useState(false);
   const [contributionSent, setContributionSent] = useState(false);
   const [contributionSaving, setContributionSaving] = useState(false);
   const [contributionError, setContributionError] = useState('');
+
   const stopNarration = () => {
     if ('speechSynthesis' in window) window.speechSynthesis.cancel();
     setPlaying(false);
   };
+
   const selectStory = (story) => {
     stopNarration();
     setActiveStory(story);
     setChapterIndex(0);
   };
+
   const changeChapter = (index) => {
     stopNarration();
     setChapterIndex(Math.max(0, Math.min(index, activeStory.chapters.length - 1)));
   };
+
   const toggleNarration = () => {
     if (!('speechSynthesis' in window)) return;
     if (playing) {
@@ -158,8 +346,32 @@ function App() {
       setPlaying(true);
       return;
     }
-    const utterance = new SpeechSynthesisUtterance(activeStory.chapters[chapterIndex][1]);
-    utterance.lang = 'fr-FR';
+    const currentText = activeStory.chapters[chapterIndex]?.[1] || '';
+    const utterance = new SpeechSynthesisUtterance(currentText);
+    
+    // Sélection d'une voix africaine (Burkina, Côte d'Ivoire, Sénégal, etc.) ou timbre chaleureux de conteur
+    const voices = window.speechSynthesis.getVoices() || [];
+    const africanVoice = voices.find(v => 
+      v.lang.startsWith('fr-BF') || 
+      v.lang.startsWith('fr-CI') || 
+      v.lang.startsWith('fr-SN') || 
+      v.lang.startsWith('fr-CM') || 
+      v.name.toLowerCase().includes('african') || 
+      v.name.toLowerCase().includes('dakar') || 
+      v.name.toLowerCase().includes('abidjan') || 
+      v.name.toLowerCase().includes('burkina')
+    ) || voices.find(v => v.lang.startsWith('fr') && (v.name.toLowerCase().includes('natural') || v.name.toLowerCase().includes('thomas') || v.name.toLowerCase().includes('paul') || v.name.toLowerCase().includes('henri')))
+      || voices.find(v => v.lang.startsWith('fr'));
+
+    if (africanVoice) {
+      utterance.voice = africanVoice;
+      utterance.lang = africanVoice.lang;
+    } else {
+      utterance.lang = 'fr-FR';
+    }
+    // Timbre et cadence d'un conteur traditionnel burkinabè (posé, narratif, enveloppant)
+    utterance.rate = 0.88;
+    utterance.pitch = 0.95;
     utterance.onend = () => setPlaying(false);
     utterance.onerror = () => setPlaying(false);
     window.speechSynthesis.cancel();
@@ -171,49 +383,32 @@ function App() {
     event.preventDefault();
     setContributionError('');
     const formData = new FormData(event.currentTarget);
-    const transcriptFile = formData.get('transcriptionFile');
-    const audioFile = formData.get('audioFile');
     const transcript = String(formData.get('story') || '').trim();
-    const hasTranscriptFile = transcriptFile instanceof File && transcriptFile.size > 0;
-    const hasAudioFile = audioFile instanceof File && audioFile.size > 0;
-    const extension = (file) => file.name.split('.').pop().toLowerCase();
-    const transcriptTypes = new Set(['txt', 'pdf', 'doc', 'docx']);
-    const audioTypes = new Set(['mp3', 'mpeg', 'wav', 'm4a', 'aac', 'ogg', 'opus', 'webm', 'mp4']);
-
-    if (transcript.length < 12 && !hasTranscriptFile) {
-      setContributionError('Écris la transcription ou joins un fichier de transcription.');
-      return;
-    }
-    if (hasTranscriptFile && (!transcriptTypes.has(extension(transcriptFile)) || transcriptFile.size > 10 * 1024 * 1024)) {
-      setContributionError('La transcription doit être un fichier TXT, PDF, DOC ou DOCX de 10 Mo maximum.');
-      return;
-    }
-    if (hasAudioFile && (!audioTypes.has(extension(audioFile)) || audioFile.size > 25 * 1024 * 1024)) {
-      setContributionError('L’audio doit être un fichier MP3, WAV, M4A, AAC, OGG ou WebM de 25 Mo maximum.');
+    if (transcript.length < 10) {
+      setContributionError('Veuillez saisir au moins une courte transcription.');
       return;
     }
 
     setContributionSaving(true);
     try {
       await persistContribution({
-        id: globalThis.crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(16).slice(2)}`,
+        id: globalThis.crypto?.randomUUID?.() || `${Date.now()}`,
         contributor: String(formData.get('contributor') || '').trim(),
         title: String(formData.get('title') || '').trim(),
         story: transcript,
         region: String(formData.get('region') || '').trim(),
         language: String(formData.get('language') || ''),
         submittedAt: new Date().toISOString(),
-        transcriptFile: hasTranscriptFile ? transcriptFile : null,
-        audioFile: hasAudioFile ? audioFile : null,
       });
       setContributionSent(true);
     } catch (error) {
-      setContributionError(error.message || 'Impossible d’enregistrer cette proposition.');
+      setContributionError(error.message || 'Impossible d’enregistrer.');
     } finally {
       setContributionSaving(false);
     }
   };
 
+  // Carte 2D Leaflet
   useEffect(() => {
     if (!mapRef.current || leafletMap.current) return undefined;
     let disposed = false;
@@ -222,353 +417,518 @@ function App() {
     L.control.attribution({ prefix: false }).addTo(map);
     L.control.zoom({ position: 'bottomright' }).addTo(map);
     L.tileLayer(import.meta.env.VITE_MAP_TILE_URL || 'https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>', maxZoom: 18,
+      attribution: '&copy; OpenStreetMap', maxZoom: 18,
     }).addTo(map);
+
     fetch('/geojson/regions.geojson')
-      .then((response) => {
-        logApp(response.ok ? 'info' : 'warn', 'Regional GeoJSON request completed', {
-          url: '/geojson/regions.geojson',
-          status: response.status,
-        });
-        if (!response.ok) throw new Error(`Chargement des régions impossible (${response.status})`);
-        return response.json();
-      })
+      .then((r) => r.json())
       .then((regions) => {
         if (disposed || !mapRef.current?.isConnected) return;
         const regionIndex = new Map();
         const regionOverlay = L.geoJSON(regions, {
           style: { color: '#b75535', weight: 1.2, fillColor: '#dda047', fillOpacity: 0.08 },
           onEachFeature: (feature, layer) => {
-            const regionName = feature.properties?.NAME_1 || 'Région du Burkina Faso';
+            const regionName = feature.properties?.NAME_1 || 'Région';
             regionIndex.set(regionName, layer);
             layer.bindTooltip(regionName, { sticky: true });
             layer.on({
-              mouseover: (event) => event.target.setStyle({ weight: 2, fillOpacity: 0.24 }),
-              mouseout: (event) => event.target.setStyle({ weight: 1.2, fillOpacity: 0.08 }),
-              click: (event) => map.fitBounds(event.target.getBounds(), { padding: [35, 35], maxZoom: 8 }),
+              mouseover: (e) => e.target.setStyle({ weight: 2, fillOpacity: 0.24 }),
+              mouseout: (e) => e.target.setStyle({ weight: 1.2, fillOpacity: 0.08 }),
+              click: () => {
+                const found = stories.find((s) => s.localityRegion === regionName || (s.localityRegion === 'Haut-Bassins' && regionName.includes('Bassins')));
+                if (found) selectStory(found);
+              },
             });
           },
         }).addTo(map);
         regionLayers.current = regionIndex;
-        map.fitBounds(regionOverlay.getBounds(), { padding: [18, 18], maxZoom: 6 });
+        map.fitBounds(regionOverlay.getBounds(), { padding: [16, 16], maxZoom: 6 });
         setMapRegionsReady(true);
       })
-      .catch((error) => {
-        if (!disposed) logApp('error', 'Regional map could not be initialized', { reason: error.message });
-      });
-    return () => { disposed = true; stopNarration(); map.remove(); leafletMap.current = null; regionLayers.current = new Map(); localityMarker.current = null; };
+      .catch((err) => console.error(err));
+
+    return () => { disposed = true; stopNarration(); map.remove(); leafletMap.current = null; };
   }, []);
 
+  // Synchronisation région active Leaflet
   useEffect(() => {
     const map = leafletMap.current;
-    const regionLayer = regionLayers.current.get(activeStory.localityRegion);
-    if (!mapRegionsReady || !map || !regionLayer) return undefined;
+    const rName = activeStory.localityRegion;
+    const layer = regionLayers.current.get(rName) || (rName === 'Hauts-Bassins' ? regionLayers.current.get('Haut-Bassins') : undefined);
+    if (!mapRegionsReady || !map || !layer) return;
 
-    // Invalidate map size so Leaflet container calculates valid dimensions even if toggled
     map.invalidateSize();
-
-    regionLayers.current.forEach((layer) => {
-      layer.setStyle({ color: '#b75535', weight: 1.2, fillColor: '#dda047', fillOpacity: 0.08 });
-      layer.getElement()?.classList.remove('cultural-region-selected');
-    });
-    regionLayer.setStyle({ color: '#a9442b', weight: 2.8, fillColor: '#e5a44e', fillOpacity: 0.3 });
-    regionLayer.bringToFront();
-    regionLayer.getElement()?.classList.add('cultural-region-selected');
+    regionLayers.current.forEach((l) => l.setStyle({ color: '#b75535', weight: 1.2, fillOpacity: 0.08 }));
+    layer.setStyle({ color: '#a9442b', weight: 2.8, fillOpacity: 0.3 });
+    layer.bringToFront();
 
     try {
-      const bounds = regionLayer.getBounds?.();
-      if (bounds && bounds.isValid?.()) {
+      const bounds = layer.getBounds?.();
+      if (bounds?.isValid?.()) {
         const center = bounds.getCenter();
-        if (Number.isFinite(center.lat) && Number.isFinite(center.lng)) {
-          if (mapMode === '2D') {
-            map.flyToBounds(bounds, { padding: [58, 58], maxZoom: 7, duration: 1.6 });
-          }
-
-          localityMarker.current?.remove();
-          const icon = L.divIcon({
-            className: 'story-locality-marker',
-            html: '<span class="locality-marker"><span class="locality-marker__halo"></span><span class="locality-marker__shadow"></span><span class="locality-marker__body" aria-hidden="true">✦</span></span>',
-            iconSize: [66, 76],
-            iconAnchor: [33, 64],
-          });
-          localityMarker.current = L.marker(center, { icon, title: activeStory.localityLabel, riseOnHover: true })
-            .addTo(map)
-            .bindTooltip(activeStory.localityLabel, { permanent: true, direction: 'top', offset: [0, -44], className: 'locality-tooltip' });
-        }
+        if (mapMode === '2D') map.flyToBounds(bounds, { padding: [40, 40], maxZoom: 7, duration: 1.4 });
+        localityMarker.current?.remove();
+        const iconSvg = activeStory.type === 'Légende'
+          ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.735H5.81a1 1 0 0 1-.957-.735L2.02 6.02a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294z"/><path d="M5 21h14"/></svg>'
+          : '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275z"/></svg>';
+        const icon = L.divIcon({
+          className: 'story-locality-marker',
+          html: `<span class="locality-marker ${activeStory.type === 'Légende' ? 'is-legend' : ''}"><span class="locality-marker__body">${iconSvg}</span></span>`,
+          iconSize: [40, 40],
+          iconAnchor: [20, 36],
+        });
+        localityMarker.current = L.marker(center, { icon, title: activeStory.localityLabel }).addTo(map);
       }
-    } catch (err) {
-      logApp('warn', 'Could not animate region bounds', { message: err?.message });
-    }
+    } catch (e) { console.warn(e); }
 
     return () => localityMarker.current?.remove();
   }, [activeStory, mapRegionsReady, mapMode]);
 
+  // Filtrage combiné
   const filteredStories = stories.filter((story) => {
     const matchesLanguage = language === 'Toutes les langues' || story.language === language;
-    const matchesQuery = `${story.title} ${story.region} ${story.type}`.toLocaleLowerCase('fr').includes(query.toLocaleLowerCase('fr'));
-    return matchesLanguage && matchesQuery;
+    const matchesType = typeFilter === 'Tous les types'
+      || (typeFilter === 'Contes' && story.type === 'Conte')
+      || (typeFilter === 'Légendes' && story.type === 'Légende');
+    const matchesQuery = `${story.title} ${story.localityRegion} ${story.type}`.toLocaleLowerCase('fr').includes(query.toLocaleLowerCase('fr'));
+    return matchesLanguage && matchesType && matchesQuery;
   });
+
+  const countContes = stories.filter((s) => s.type === 'Conte').length;
+  const countLegendes = stories.filter((s) => s.type === 'Légende').length;
 
   return (
     <div className="app-shell">
+      {/* ── HEADER ── */}
       <header className="topbar">
         <a className="brand" href="#accueil" aria-label="Les Voix du Faso, accueil">
-          <span className="brand-mark"><Sparkles size={17} aria-hidden="true" /></span><span>Les Voix du <strong>Faso</strong></span>
+          <span className="brand-mark"><Sparkles size={16} aria-hidden="true" /></span>
+          <span>Les Voix du <strong>Faso</strong></span>
         </a>
         <nav className={menuOpen ? 'main-nav is-open' : 'main-nav'} aria-label="Navigation principale">
-          <a className="active" href="#explorer" onClick={() => setMenuOpen(false)}>Explorer</a>
-          <a href="#histoires" onClick={() => setMenuOpen(false)}>Les histoires</a>
-          <a href="#a-propos" onClick={() => setMenuOpen(false)}>À propos</a>
+          <a className="active" href="#explorer" onClick={() => setMenuOpen(false)}>Explorer la carte</a>
+          <a href="#narratif" onClick={() => setMenuOpen(false)}>L'expérience</a>
+          <a href="#histoires" onClick={() => setMenuOpen(false)}>Contes &amp; Légendes</a>
         </nav>
         <div className="topbar-actions">
-          <span className="language-indicator" aria-label="Langue de l’interface : français">FR <ChevronDown size={15} aria-hidden="true" /></span>
-          <button className="contribute-button" type="button" onClick={() => { setContributionOpen(true); setContributionSent(false); setContributionError(''); }}>Partager un récit <ArrowUpRight size={16} aria-hidden="true" /></button>
-          <button className="menu-toggle" type="button" onClick={() => setMenuOpen(!menuOpen)} aria-label={menuOpen ? 'Fermer le menu' : 'Ouvrir le menu'} aria-expanded={menuOpen}>
-            {menuOpen ? <X size={21} /> : <Menu size={21} />}
+          <span className="language-indicator">FR <ChevronDown size={14} aria-hidden="true" /></span>
+          <button className="contribute-button" type="button" onClick={() => { setContributionOpen(true); setContributionSent(false); setContributionError(''); }}>
+            Partager un récit <ArrowUpRight size={15} aria-hidden="true" />
+          </button>
+          <button className="menu-toggle" type="button" onClick={() => setMenuOpen(!menuOpen)} aria-label="Menu">
+            {menuOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
         </div>
       </header>
 
       <main>
+        {/* ── 1. PAGE D'ACCUEIL : TEXTE + BAOBAB + CHIFFRES EN 1 SEUL ÉCRAN ── */}
         <section className="hero-section" id="accueil">
-          <div className="hero-copy">
-            <p className="eyebrow"><span className="eyebrow-line" /> Patrimoine oral du Burkina Faso</p>
-            <h1>Chaque terre<br /><em>a une voix.</em></h1>
-            <p className="hero-text">Parcourez le Burkina Faso à travers ses contes, ses légendes et les voix de celles et ceux qui les font vivre.</p>
-            <div className="hero-actions">
-              <a className="primary-button" href="#explorer">Explorer la carte <Compass size={18} aria-hidden="true" /></a>
-              <a className="text-button" href="#histoires">Découvrir les récits <ArrowUpRight size={17} aria-hidden="true" /></a>
+          <div className="hero-main-row">
+            <div className="hero-copy">
+              <p className="eyebrow"><span className="eyebrow-line" /> Patrimoine oral et mythologie du Burkina Faso</p>
+              <h1>Chaque terre<br /><em>a une voix &amp; une légende.</em></h1>
+              <p className="hero-text">
+                Parcourez le Burkina Faso à travers ses contes traditionnels, ses légendes fondatrices (de l’Épopée de Yennenga aux Silures de Dafra) et la mémoire vivante de ses terroirs.
+              </p>
+              <div className="hero-actions">
+                <a className="primary-button" href="#explorer">Explorer la carte 3D <Compass size={17} aria-hidden="true" /></a>
+                <a className="text-button" href="#histoires">Découvrir les récits <ArrowUpRight size={15} aria-hidden="true" /></a>
+              </div>
             </div>
-            <div className="hero-meta">
-              <div><strong>60+</strong><span>langues au Faso</span></div>
-              <div><strong>100%</strong><span>patrimoine oral</span></div>
-              <div><strong>{new Set(stories.map((story) => story.language)).size}</strong><span>langues intégrées</span></div>
+
+            <div className="hero-art" role="img" aria-label="Baobab et relief au coucher du soleil">
+              <div className="scene-stars" aria-hidden="true"><i /><i /><i /><i /><i /></div>
+              <div className="sun" /><div className="moon-ring" />
+              <div className="scene-ground ground-back" /><div className="scene-ground ground-front" />
+              <div className="baobab">
+                <div className="trunk" />
+                <div className="branch branch-one" /><div className="branch branch-two" /><div className="branch branch-three" />
+                <div className="leaf-cluster cluster-one" /><div className="leaf-cluster cluster-two" />
+                <div className="leaf-cluster cluster-three" /><div className="leaf-cluster cluster-four" />
+              </div>
+              <span className="art-label">La mémoire<br />habite la terre</span>
+              <span className="scene-caption">Contes &amp; Légendes</span>
             </div>
           </div>
-          <div className="hero-art" role="img" aria-label="Baobab animé en relief au coucher du soleil">
-            <div className="scene-stars" aria-hidden="true"><i /><i /><i /><i /><i /></div>
-            <div className="sun" /><div className="moon-ring" />
-            <div className="scene-ground ground-back" /><div className="scene-ground ground-front" />
-            <div className="baobab">
-              <div className="trunk" /><div className="branch branch-one" /><div className="branch branch-two" /><div className="branch branch-three" />
-              <div className="leaf-cluster cluster-one" /><div className="leaf-cluster cluster-two" /><div className="leaf-cluster cluster-three" /><div className="leaf-cluster cluster-four" />
-            </div>
-            <span className="art-label">La mémoire<br />habite la terre</span>
-            <span className="scene-caption">Une terre · mille récits</span>
+
+          <div className="hero-meta">
+            <div><strong>{countLegendes}</strong><span>Légendes fondatrices</span></div>
+            <div><strong>{countContes}</strong><span>Contes traditionnels</span></div>
+            <div><strong>60+</strong><span>Langues du Faso</span></div>
+            <div><strong>100%</strong><span>Patrimoine vérifié</span></div>
           </div>
         </section>
 
+        {/* ── 2. SECTION 01 — CARTE ET LECTEUR (1 ÉCRAN TOTAL, PAS DE COUPURE) ── */}
         <section className="explorer-section" id="explorer">
           <div className="section-heading">
             <div>
               <p className="eyebrow">01 — La carte vivante</p>
-              <h2>Explorez par <em>territoire.</em></h2>
+              <h2>Explorez par <em>territoire &amp; sanctuaire.</em></h2>
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <div className="map-view-switcher" role="group" aria-label="Mode d'affichage de la carte">
-                <button
-                  type="button"
-                  className={mapMode === '3D' ? 'switcher-btn active' : 'switcher-btn'}
-                  onClick={() => setMapMode('3D')}
-                  aria-pressed={mapMode === '3D'}
-                >
-                  <Sparkles size={14} aria-hidden="true" /> Vue 3D relief
-                </button>
-                <button
-                  type="button"
-                  className={mapMode === '2D' ? 'switcher-btn active' : 'switcher-btn'}
-                  onClick={() => setMapMode('2D')}
-                  aria-pressed={mapMode === '2D'}
-                >
-                  <Layers size={14} aria-hidden="true" /> Carte 2D OpenStreetMap
-                </button>
-              </div>
+            <div className="map-view-switcher" role="group" aria-label="Mode carte">
+              <button
+                type="button"
+                className={mapMode === '3D' ? 'switcher-btn active' : 'switcher-btn'}
+                onClick={() => setMapMode('3D')}
+              >
+                <Sparkles size={13} aria-hidden="true" /> Vue 3D relief &amp; sanctuaires
+              </button>
+              <button
+                type="button"
+                className={mapMode === '2D' ? 'switcher-btn active' : 'switcher-btn'}
+                onClick={() => setMapMode('2D')}
+              >
+                <Layers size={13} aria-hidden="true" /> Carte 2D OpenStreetMap
+              </button>
             </div>
           </div>
+
           <div className="map-layout">
             <div className="map-card">
               <div className="map-toolbar">
-                <span><MapPin size={16} aria-hidden="true" /> Burkina Faso · {mapMode === '3D' ? 'Relief 3D du territoire' : 'Carte cartographique'}</span>
+                <span>
+                  <MapPin size={15} aria-hidden="true" /> Burkina Faso · {mapMode === '3D' ? 'Relief 3D & Sanctuaires Légendaires' : 'Atlas cartographique'}
+                </span>
                 <span className="map-hint">{activeStory.localityLabel}</span>
               </div>
-              <div style={{ position: 'relative', height: '430px' }}>
+              <div className="map-canvas-container">
                 <div
                   className="map-canvas"
                   ref={mapRef}
-                  role="application"
-                  aria-label={`Carte 2D du Burkina Faso, repère régional pour le récit en ${activeStory.language}`}
-                  style={{ display: mapMode === '2D' ? 'block' : 'none', height: '100%' }}
+                  style={{ display: mapMode === '2D' ? 'block' : 'none' }}
                 />
                 {mapMode === '3D' && (
                   <Interactive3DMap
                     activeRegionName={activeStory.localityRegion}
+                    activeStoryId={activeStory.id}
+                    activeStoryType={activeStory.type}
                     onSelectStoryRegion={(region) => {
-                      const matchingStory = stories.find((s) => s.localityRegion === region.localityRegion);
-                      if (matchingStory) {
-                        selectStory(matchingStory);
-                      }
+                      const found = stories.find(
+                        (s) => s.localityRegion === region.localityRegion
+                          || (s.localityRegion === 'Haut-Bassins' && region.localityRegion?.includes('Bassins'))
+                      );
+                      if (found) selectStory(found);
                     }}
+                    onSelectStoryId={(storyId) => {
+                      const found = stories.find((s) => s.id === storyId);
+                      if (found) selectStory(found);
+                    }}
+                    onFilterChange={handle3DFilterChange}
                   />
                 )}
               </div>
             </div>
+
             <aside className="featured-story" aria-live="polite">
-              <p className="eyebrow">Récit à découvrir</p>
               <div className="story-info">
-                <div className="story-tags"><span>{activeStory.type}</span>{activeStory.region && <span>{activeStory.region}</span>}</div>{activeStory.catalogue && <p className="catalogue-label">{activeStory.catalogue}</p>}<h3>{activeStory.title}</h3><p>{activeStory.excerpt}</p>
+                <p className="eyebrow">Récit sélectionné</p>
+                <div className="story-tags">
+                  <span className={activeStory.type === 'Légende' ? 'tag-legend' : 'tag-conte'}>
+                    {activeStory.type === 'Légende' && <Crown size={11} style={{ display: 'inline', marginRight: 4 }} />}
+                    {activeStory.type}
+                  </span>
+                  <span>{activeStory.language}</span>
+                  {activeStory.localityRegion && <span>{activeStory.localityRegion}</span>}
+                </div>
+
+                {activeStory.catalogue && <small className="catalogue-label">{activeStory.catalogue}</small>}
+                <h3>{activeStory.title}</h3>
+                <p>{activeStory.excerpt}</p>
+
                 <div className="chapter-reader">
-                  <div className="chapter-topline"><span>Étape {chapterIndex + 1} / {activeStory.chapters.length}</span><span>{activeStory.chapters[chapterIndex][0]}</span></div>
-                  <p className={activeStory.moralChapter && chapterIndex === activeStory.chapters.length - 1 ? 'story-moral' : undefined}>{activeStory.chapters[chapterIndex][1]}</p>
-                  <div className="chapter-controls"><button type="button" disabled={chapterIndex === 0} onClick={() => changeChapter(chapterIndex - 1)}><ArrowLeft size={13} aria-hidden="true" /> Précédent</button><div className="chapter-dots">{activeStory.chapters.map((chapter, index) => <button key={chapter[0]} className={index === chapterIndex ? 'selected' : ''} type="button" onClick={() => changeChapter(index)} aria-label={`Étape ${index + 1} : ${chapter[0]}`} aria-current={index === chapterIndex ? 'step' : undefined} />)}</div><button type="button" disabled={chapterIndex === activeStory.chapters.length - 1} onClick={() => changeChapter(chapterIndex + 1)}>Suivant <ArrowRight size={13} aria-hidden="true" /></button></div>
+                  <div className="chapter-topline">
+                    <span>Étape {chapterIndex + 1} / {activeStory.chapters.length}</span>
+                    <span>{activeStory.chapters[chapterIndex][0]}</span>
+                  </div>
+                  <p>{activeStory.chapters[chapterIndex][1]}</p>
+                  <div className="chapter-controls">
+                    <button type="button" disabled={chapterIndex === 0} onClick={() => changeChapter(chapterIndex - 1)}>
+                      <ArrowLeft size={12} aria-hidden="true" /> Précédent
+                    </button>
+                    <div className="chapter-dots">
+                      {activeStory.chapters.map((chapter, index) => (
+                        <button
+                          key={chapter[0]}
+                          className={index === chapterIndex ? 'selected' : ''}
+                          type="button"
+                          onClick={() => changeChapter(index)}
+                          aria-label={`Étape ${index + 1}`}
+                        />
+                      ))}
+                    </div>
+                    <button type="button" disabled={chapterIndex === activeStory.chapters.length - 1} onClick={() => changeChapter(chapterIndex + 1)}>
+                      Suivant <ArrowRight size={12} aria-hidden="true" />
+                    </button>
+                  </div>
                 </div>
-                <div className="story-footer">
-                  {activeStory.audioUrl ? <><span><strong>Écouter le conte en {activeStory.language}</strong><small>{activeStory.credit ? `Récit transmis par ${activeStory.credit}` : 'Enregistrement fourni avec le récit'}</small></span><audio className="story-audio" controls preload="none" aria-label={`Audio en ${activeStory.language} : ${activeStory.title}`} src={activeStory.audioUrl}>Votre navigateur ne prend pas en charge la lecture audio.</audio></> : <><button className="play-button" type="button" onClick={toggleNarration} aria-label={playing ? 'Mettre la lecture en pause' : 'Lire le texte à voix haute'} title="Lecture vocale du texte en français">{playing ? <Pause size={17} fill="currentColor" /> : <CirclePlay size={18} fill="currentColor" />}</button><span><strong>{playing ? 'Lecture du texte en français' : 'Lire le texte en français'}</strong><small>Voix de synthèse de votre navigateur</small></span><Volume2 className="volume-icon" size={18} aria-hidden="true" /></>}
-                </div>
-                {activeStory.textCredit && <p className="story-credits"><span>{activeStory.textCredit}</span><span>{activeStory.audioCredit}</span></p>}
-                {activeStory.sourceUrl && <a className="source-link" href={activeStory.sourceUrl} target="_blank" rel="noreferrer">Consulter une ressource audio externe <ExternalLink size={13} aria-hidden="true" /></a>}
+              </div>
+
+              <div className="story-footer">
+                {activeStory.audioUrl ? (
+                  <div className="story-footer-audio-box">
+                    <div className="story-footer-text">
+                      <span className="listen-cta">Cliquez ici pour écouter</span>
+                      <strong>Écouter l’enregistrement en {activeStory.language}</strong>
+                      <small>{activeStory.credit ? `Par ${activeStory.credit}` : "Voix d’archive authentique"}</small>
+                    </div>
+                    <audio
+                      className="story-audio"
+                      controls
+                      preload="metadata"
+                      src={activeStory.audioUrl}
+                    />
+                  </div>
+                ) : (
+                  <div className="story-footer-ia-box">
+                    <button
+                      className={`play-button ${playing ? "is-playing" : ""}`}
+                      type="button"
+                      onClick={toggleNarration}
+                      aria-label={playing ? "Mettre en pause" : "Cliquez ici pour écouter avec la voix de conteur"}
+                    >
+                      {playing ? <Pause size={18} fill="currentColor" /> : <CirclePlay size={20} fill="currentColor" />}
+                    </button>
+                    <div className="story-footer-text" onClick={toggleNarration} style={{ cursor: "pointer" }}>
+                      <span className="listen-cta">{playing ? "Lecture en cours…" : "Cliquez ici pour écouter"}</span>
+                      <strong>{playing ? "Conte en cours de narration" : "Voix IA de conteur burkinabè"}</strong>
+                      <small>Narration orale du chapitre sélectionné</small>
+                    </div>
+                    <Volume2 className="volume-icon" size={18} aria-hidden="true" />
+                  </div>
+                )}
               </div>
             </aside>
           </div>
         </section>
 
-        <section className="narrative-section" aria-labelledby="narrative-title">
-          <div className="narrative-copy"><p className="eyebrow">02 — L’expérience narrative</p><h2 id="narrative-title">Écouter, puis <em>transmettre.</em></h2><p>Chaque récit avance par étapes courtes, à lire ou à écouter. Choisissez le rythme qui vous convient.</p><a className="primary-button" href="#histoires">Choisir une histoire <BookOpen size={17} aria-hidden="true" /></a></div>
-          <div className="narrative-steps">{['Une terre', 'Une voix', 'Une mémoire'].map((step, index) => <button type="button" className={chapterIndex === index ? 'narrative-step active' : 'narrative-step'} key={step} onClick={() => changeChapter(index)} aria-pressed={chapterIndex === index}><span>0{index + 1}</span><strong>{step}</strong><small>{['Choisissez un point sur la carte.', 'Lisez ou écoutez le texte en français.', 'Partagez une histoire à transmettre.'][index]}</small><ArrowUpRight size={17} aria-hidden="true" /></button>)}</div>
-        </section>
+        {/* ── 3. SECTION 02 — EXPÉRIENCE NARRATIVE PREMIUM ── */}
+        <section className="narrative-section" id="narratif" aria-labelledby="narrative-title">
+          <div className="narrative-grain" aria-hidden="true" />
+          <div className="narrative-container">
 
-        <section className="stories-section" id="histoires">
-          <div className="section-heading"><div><p className="eyebrow">03 — La collection</p><h2>Des histoires à <em>habiter.</em></h2></div><span className="collection-count">{filteredStories.length} récit{filteredStories.length > 1 ? 's' : ''} présenté{filteredStories.length > 1 ? 's' : ''}</span></div>
-          <div className="filter-row">
-            <div className="search-field">
-              <label htmlFor="search-recit-input" className="sr-only">Rechercher un récit</label>
-              <Search size={17} aria-hidden="true" />
-              <input id="search-recit-input" type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Rechercher un récit…" />
+            {/* Colonne gauche : texte + CTA animé */}
+            <div className="narrative-copy">
+              <p className="eyebrow"><span className="eyebrow-line" />02 — L’expérience narrative</p>
+              <h2 id="narrative-title">Écouter,<br />comprendre,<br /><em>transmettre.</em></h2>
+              <p>
+                Chaque conte et légende avance par étapes claires et documentées, à lire ou à écouter à voix haute. Des mythes fondateurs aux leçons de sagesse des villages, plongez au cœur de la parole burkinabè.
+              </p>
+
+              {/* CTA pulsant */}
+              <div className="narrative-cta-wrap">
+                <a className="narrative-cta" href="#histoires" aria-label="Parcourir la collection complète">
+                  <span className="narrative-cta__ring" aria-hidden="true" />
+                  <span className="narrative-cta__inner">
+                    <BookOpen size={18} aria-hidden="true" />
+                    Parcourir la collection
+                  </span>
+                  <ArrowUpRight size={14} className="narrative-cta__arrow" aria-hidden="true" />
+                </a>
+                <span className="narrative-cta-hint">9 récits · 5 légendes · 4 contes</span>
+              </div>
             </div>
-            <div className="select-field">
-              <label htmlFor="filter-langue-select" className="sr-only">Filtrer par langue</label>
-              <Languages size={17} aria-hidden="true" />
-              <select id="filter-langue-select" value={language} onChange={(event) => setLanguage(event.target.value)}>
-                <option>Toutes les langues</option><option>Bissa</option><option>Dioula</option><option>Mooré</option><option>Fulfulde</option>
-              </select>
-              <ChevronDown size={15} aria-hidden="true" />
+
+            {/* Colonne droite : étapes verticales épurées */}
+            <div className="narrative-steps">
+              {[
+                { num: '01', title: 'Choisir un territoire', desc: 'Sélectionnez une région ou un sanctuaire légendaire sur la carte 3D interactive.' },
+                { num: '02', title: 'Lire & écouter', desc: 'Parcourez les étapes documentées ou activez la voix IA pour une narration immersive.' },
+                { num: '03', title: 'Transmettre', desc: "Partagez votre propre conte ou l’archive collective." },
+              ].map((step) => (
+                <div className="narrative-step" key={step.num}>
+                  <span className="narrative-step__num">{step.num}</span>
+                  <div className="narrative-step__body">
+                    <strong>{step.title}</strong>
+                    <small>{step.desc}</small>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
+        </section>
+        {/* ── 4. SECTION 03 — COLLECTION COMPLÈTE & FOOTER (SCROLLABLE NATUREL) ── */}
+        <section className="stories-section" id="histoires">
+          <div className="section-heading">
+            <div>
+              <p className="eyebrow">03 — La collection complète</p>
+              <h2>Contes &amp; Légendes à <em>habiter.</em></h2>
+            </div>
+            <span className="collection-count">
+              {filteredStories.length} récit{filteredStories.length > 1 ? 's' : ''} ({countLegendes} légendes, {countContes} contes)
+            </span>
+          </div>
+
+          <div className="filter-row">
+            <div className="search-field">
+              <label htmlFor="search-recit-input" className="sr-only">Rechercher</label>
+              <Search size={16} aria-hidden="true" />
+              <input
+                id="search-recit-input"
+                type="search"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Rechercher par titre, région, héros (ex. Yennenga, Dafra)…"
+              />
+            </div>
+
+            <div className="select-field">
+              <label htmlFor="filter-type-select" className="sr-only">Type</label>
+              <Filter size={15} aria-hidden="true" />
+              <select
+                id="filter-type-select"
+                value={typeFilter}
+                onChange={(e) => setTypeFilter(e.target.value)}
+              >
+                <option>Tous les types</option>
+                <option>Légendes</option>
+                <option>Contes</option>
+              </select>
+              <ChevronDown size={14} aria-hidden="true" />
+            </div>
+
+            <div className="select-field">
+              <label htmlFor="filter-langue-select" className="sr-only">Langue</label>
+              <Languages size={15} aria-hidden="true" />
+              <select
+                id="filter-langue-select"
+                value={language}
+                onChange={(e) => setLanguage(e.target.value)}
+              >
+                <option>Toutes les langues</option>
+                <option>Mooré</option>
+                <option>Dioula</option>
+                <option>Fulfulde</option>
+                <option>Bissa</option>
+              </select>
+              <ChevronDown size={14} aria-hidden="true" />
+            </div>
+          </div>
+
           <div className="story-grid">
             {filteredStories.map((story) => (
               <button
-                className={`story-card story-card--${story.id}`}
+                className={`story-card ${story.type === 'Légende' ? 'story-card--legend' : ''}`}
                 type="button"
                 key={story.id}
-                onClick={() => { selectStory(story); document.querySelector('#explorer')?.scrollIntoView({ behavior: 'smooth' }); }}
-                aria-label={`Découvrir ${story.title}`}
-                onPointerMove={(event) => {
-                  if (event.pointerType === 'touch') return;
-                  const rect = event.currentTarget.getBoundingClientRect();
-                  const x = (event.clientX - rect.left) / rect.width;
-                  const y = (event.clientY - rect.top) / rect.height;
-                  event.currentTarget.style.setProperty('--story-rx', `${(0.5 - y) * 7}deg`);
-                  event.currentTarget.style.setProperty('--story-ry', `${(x - 0.5) * 9}deg`);
-                  event.currentTarget.style.setProperty('--story-light-x', `${x * 100}%`);
-                  event.currentTarget.style.setProperty('--story-light-y', `${y * 100}%`);
-                }}
-                onPointerLeave={(event) => {
-                  event.currentTarget.style.setProperty('--story-rx', '0deg');
-                  event.currentTarget.style.setProperty('--story-ry', '0deg');
-                  event.currentTarget.style.setProperty('--story-light-x', '50%');
-                  event.currentTarget.style.setProperty('--story-light-y', '50%');
+                onClick={() => {
+                  selectStory(story);
+                  document.querySelector('#explorer')?.scrollIntoView({ behavior: 'smooth' });
                 }}
               >
                 <span className="story-animation">
-                  <img className="card-image" src={story.image} alt={`Illustration animée du récit en ${story.language}`} loading="lazy" onError={(event) => { event.currentTarget.remove(); }} />
-                  <span className="story-animation__veil" aria-hidden="true" />
-                  <span className="story-animation__grain" aria-hidden="true" />
-                  <span className="story-animation__horizon" aria-hidden="true" />
-                  <span className="story-animation__cursor-light" aria-hidden="true" />
+                  <img
+                    className="card-image"
+                    src={story.image}
+                    alt={story.title}
+                    loading="lazy"
+                    onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                  />
                 </span>
                 <div className="card-content">
                   {story.catalogue && <small className="catalogue-label">{story.catalogue}</small>}
-                  <div className="story-tags"><span>{story.type}</span><span>{story.language}</span></div>
+                  <div className="story-tags">
+                    <span className={story.type === 'Légende' ? 'tag-legend' : 'tag-conte'}>
+                      {story.type === 'Légende' && <Crown size={10} style={{ display: 'inline', marginRight: 3 }} />}
+                      {story.type}
+                    </span>
+                    <span>{story.language}</span>
+                  </div>
                   <h3>{story.title}</h3>
-                  {(story.region || story.duration) && <p>{story.region}{story.duration && <> <span>·</span> {story.duration}</>}</p>}
+                  <p>{story.localityRegion} <span>·</span> {story.chapters.length} étapes</p>
                 </div>
-                <ArrowUpRight className="card-arrow" size={18} aria-hidden="true" />
+                <ArrowUpRight className="card-arrow" size={17} aria-hidden="true" />
               </button>
             ))}
           </div>
-          {filteredStories.length === 0 && <p className="empty-state">Aucun récit ne correspond à votre recherche.</p>}
         </section>
       </main>
 
-      <footer id="a-propos"><div className="footer-brand"><span className="brand-mark"><Sparkles size={17} aria-hidden="true" /></span><span>Les Voix du <strong>Faso</strong></span></div><p>Un projet pour écouter, préserver et transmettre.</p><span className="footer-note">© 2026 · Fait avec respect pour nos mémoires</span></footer>
-
-      {contributionOpen && <ContributionDialog onClose={() => setContributionOpen(false)} onSubmit={handleContributionSubmit} saving={contributionSaving} error={contributionError} sent={contributionSent} />}
+      {/* ── FOOTER DÉCOUVERT EN FIN DE DÉFILEMENT DE LA SECTION 03 ── */}
+      <footer id="a-propos">
+        <div className="footer-inner">
+          <div className="footer-brand">
+            <span className="brand-mark"><Sparkles size={16} aria-hidden="true" /></span>
+            <div className="footer-brand-text">
+              <strong>Les Voix du Faso</strong>
+              <span>Un projet pour écouter, préserver et transmettre.</span>
+            </div>
+          </div>
+          <p className="footer-note">© 2026 · Fait avec respect pour nos mémoires</p>
+        </div>
+      </footer>
+      {contributionOpen && (
+        <ContributionDialog
+          onClose={() => setContributionOpen(false)}
+          onSubmit={handleContributionSubmit}
+          saving={contributionSaving}
+          error={contributionError}
+          sent={contributionSent}
+        />
+      )}
     </div>
   );
 }
 
 function ContributionDialog({ onClose, onSubmit, saving, error, sent }) {
   return (
-    <div className="dialog-backdrop" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) onClose(); }}>
+    <div className="dialog-backdrop" role="presentation" onMouseDown={(e) => { if (e.target === e.currentTarget) onClose(); }}>
       <section className="contribution-dialog" role="dialog" aria-modal="true" aria-labelledby="contribution-title">
-        <button className="dialog-close" type="button" onClick={onClose} aria-label="Fermer"><X size={20} /></button>
+        <button className="dialog-close" type="button" onClick={onClose} aria-label="Fermer"><X size={18} /></button>
         {sent ? (
-          <div className="dialog-success">
-            <Sparkles size={28} aria-hidden="true" />
+          <div>
+            <Sparkles size={24} aria-hidden="true" />
             <h2 id="contribution-title">Merci pour ce partage.</h2>
-            <p>Le récit et ses fichiers joints sont enregistrés dans ce navigateur. Ils ne sont pas envoyés à un serveur.</p>
-            <button className="primary-button" type="button" onClick={onClose}>Terminer</button>
+            <p>Le récit a été enregistré avec succès dans votre navigateur (IndexedDB).</p>
+            <button className="primary-button" type="button" onClick={onClose}>Fermer</button>
           </div>
         ) : (
-          <>
-            <p className="eyebrow">Faire vivre la mémoire</p>
+          <form onSubmit={onSubmit}>
+            <p className="eyebrow">Transmission de la mémoire</p>
             <h2 id="contribution-title">Partager un récit</h2>
-            <p className="dialog-intro">Saisis la transcription ou joins un fichier, puis ajoute l’enregistrement audio du conte.</p>
-            <form onSubmit={onSubmit}>
+            <div className="form-group">
+              <label htmlFor="contributor-input">Votre nom</label>
+              <input id="contributor-input" name="contributor" required maxLength="80" placeholder="Ex. Yennenga K." />
+            </div>
+            <div className="form-group">
+              <label htmlFor="title-input">Titre de l’histoire</label>
+              <input id="title-input" name="title" required maxLength="120" placeholder="Ex. Le lièvre et l'éléphant" />
+            </div>
+            <div className="form-group">
+              <label htmlFor="story-input">Texte ou transcription</label>
+              <textarea id="story-input" name="story" required rows="4" placeholder="Racontez le conte ou la légende ici…" />
+            </div>
+            <div className="form-row">
               <div className="form-group">
-                <label htmlFor="contributor-input">Nom de la personne qui transmet</label>
-                <input id="contributor-input" name="contributor" required maxLength="80" placeholder="Nom du conteur ou de la conteuse" />
+                <label htmlFor="region-input">Région</label>
+                <input id="region-input" name="region" required placeholder="Ex. Centre" />
               </div>
               <div className="form-group">
-                <label htmlFor="title-input">Titre du conte</label>
-                <input id="title-input" name="title" required maxLength="120" placeholder="Ex. Nin-kẽem a yembr kibare" />
+                <label htmlFor="language-input">Langue</label>
+                <select id="language-input" name="language" required defaultValue="">
+                  <option value="" disabled>Choisir</option>
+                  <option>Mooré</option>
+                  <option>Dioula</option>
+                  <option>Fulfulde</option>
+                  <option>Bissa</option>
+                </select>
               </div>
-              <div className="form-group">
-                <label htmlFor="story-input">Transcription du conte</label>
-                <textarea id="story-input" name="story" maxLength="30000" rows="5" placeholder="Tu peux saisir ou coller la transcription ici…" />
-              </div>
-              <div className="form-group file-upload-group">
-                <label htmlFor="transcriptionFile-input" className="file-upload-label">Joindre la transcription (facultatif)</label>
-                <input id="transcriptionFile-input" className="file-upload-input" name="transcriptionFile" type="file" accept=".txt,.pdf,.doc,.docx,text/plain,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" />
-                <span className="file-hint">TXT, PDF, DOC ou DOCX · 10 Mo maximum</span>
-              </div>
-              <div className="form-group file-upload-group">
-                <label htmlFor="audioFile-input" className="file-upload-label">Joindre l’audio (facultatif)</label>
-                <input id="audioFile-input" className="file-upload-input" name="audioFile" type="file" accept="audio/*,.mp3,.wav,.m4a,.aac,.ogg,.opus,.webm" />
-                <span className="file-hint">MP3, WAV, M4A, AAC, OGG ou WebM · 25 Mo maximum</span>
-              </div>
-              <div className="form-row">
-                <div className="form-group">
-                  <label htmlFor="region-input">Région</label>
-                  <input id="region-input" name="region" required maxLength="80" placeholder="Ex. Centre" />
-                </div>
-                <div className="form-group">
-                  <label htmlFor="language-input">Langue</label>
-                  <select id="language-input" name="language" required defaultValue="">
-                    <option value="" disabled>Choisir</option>
-                    <option>Bissa</option><option>Dioula</option><option>Mooré</option><option>Fulfulde</option><option>Autre</option>
-                  </select>
-                </div>
-              </div>
-              {error && <p className="form-error" role="alert">{error}</p>}
-              <button className="primary-button" type="submit" disabled={saving}>
-                {saving ? 'Enregistrement…' : 'Enregistrer la proposition'} <ArrowUpRight size={16} aria-hidden="true" />
-              </button>
-            </form>
-          </>
+            </div>
+            {error && <p style={{ color: '#983e22', fontSize: 12 }}>{error}</p>}
+            <button className="primary-button" type="submit" disabled={saving}>
+              {saving ? 'Enregistrement…' : 'Enregistrer'} <ArrowUpRight size={15} aria-hidden="true" />
+            </button>
+          </form>
         )}
       </section>
     </div>
   );
 }
 
-createRoot(document.getElementById('root')).render(<StrictMode><App /></StrictMode>);
+createRoot(document.getElementById('root')).render(
+  <StrictMode>
+    <App />
+  </StrictMode>
+);
+

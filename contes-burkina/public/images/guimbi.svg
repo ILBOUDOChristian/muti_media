@@ -1,0 +1,80 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -40 800 540" width="100%" height="100%">
+  <defs>
+    <linearGradient id="guimbiBg" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#24141d"/>
+      <stop offset="45%" stop-color="#552438"/>
+      <stop offset="85%" stop-color="#8e3d4c"/>
+      <stop offset="100%" stop-color="#d68460"/>
+    </linearGradient>
+    <linearGradient id="danFaniIndigo" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#192a56"/>
+      <stop offset="50%" stop-color="#273c75"/>
+      <stop offset="100%" stop-color="#141f3d"/>
+    </linearGradient>
+    <linearGradient id="goldJewel" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffeaa7"/>
+      <stop offset="50%" stop-color="#fdcb6e"/>
+      <stop offset="100%" stop-color="#e17055"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Fond pourpre royal et crÃ©puscule de Sya -->
+  <rect width="800" height="500" fill="url(#guimbiBg)"/>
+
+  <!-- Architecture sahÃ©lienne en banco de Bobo-Dioulasso Ã  l'arriÃ¨re-plan -->
+  <g transform="translate(480, 210)" opacity="0.45" fill="#2d131f">
+    <!-- Murs Ã  redents et minarets coniques avec torons en bois -->
+    <rect x="0" y="110" width="110" height="90"/>
+    <polygon points="55,10 40,110 70,110"/>
+    <line x1="30" y1="50" x2="80" y2="50" stroke="#f0c294" stroke-width="2"/>
+    <line x1="25" y1="80" x2="85" y2="80" stroke="#f0c294" stroke-width="2"/>
+
+    <rect x="130" y="130" width="90" height="70"/>
+    <polygon points="175,35 160,130 190,130"/>
+    <line x1="150" y1="75" x2="200" y2="75" stroke="#f0c294" stroke-width="2"/>
+    <line x1="145" y1="105" x2="205" y2="105" stroke="#f0c294" stroke-width="2"/>
+  </g>
+
+  <!-- Silhouette majestueuse de la Princesse Guimbi Ouattara -->
+  <g transform="translate(190, 110)">
+    <!-- Tunique royale en Faso Dan Fani bleu indigo -->
+    <path d="M70,250 C40,290 20,340 10,390 L210,390 C200,340 180,290 150,250 Z" fill="url(#danFaniIndigo)"/>
+    <!-- Rayures traditionnelles tissÃ©es du Dan Fani -->
+    <line x1="45" y1="280" x2="25" y2="390" stroke="#f5cd79" stroke-width="2.5" opacity="0.8"/>
+    <line x1="75" y1="260" x2="60" y2="390" stroke="#f5cd79" stroke-width="2.5" opacity="0.8"/>
+    <line x1="105" y1="250" x2="105" y2="390" stroke="#ea8685" stroke-width="3" opacity="0.85"/>
+    <line x1="135" y1="260" x2="150" y2="390" stroke="#f5cd79" stroke-width="2.5" opacity="0.8"/>
+    <line x1="165" y1="280" x2="185" y2="390" stroke="#f5cd79" stroke-width="2.5" opacity="0.8"/>
+
+    <!-- Ã‰paules et port royal -->
+    <path d="M60,190 C60,165 90,150 110,150 C130,150 160,165 160,190 L170,260 L50,260 Z" fill="#1b2544"/>
+
+    <!-- Parure pectorale et colliers de perles royales de Sya -->
+    <path d="M80,185 Q110,215 140,185" fill="none" stroke="url(#goldJewel)" stroke-width="4.5"/>
+    <path d="M85,200 Q110,235 135,200" fill="none" stroke="url(#goldJewel)" stroke-width="3.5"/>
+    <circle cx="110" cy="225" r="7" fill="url(#goldJewel)"/>
+
+    <!-- TÃªte et profil royal noble -->
+    <ellipse cx="110" cy="115" rx="32" ry="38" fill="#301c18"/>
+
+    <!-- Coiffe royale somptueuse en Ã©toffe travaillÃ©e -->
+    <path d="M74,105 C70,60 95,30 110,25 C125,30 150,60 146,105 Z" fill="#8e2b44"/>
+    <ellipse cx="110" cy="30" rx="14" ry="12" fill="url(#goldJewel)"/>
+    <path d="M78,95 Q110,75 142,95" fill="none" stroke="url(#goldJewel)" stroke-width="3"/>
+
+    <!-- Boucle d'oreille d'or ouvragÃ©e -->
+    <circle cx="72" cy="122" r="7" fill="none" stroke="url(#goldJewel)" stroke-width="2.5"/>
+  </g>
+
+  <!-- Puits creusÃ© par Guimbi Ouattara Ã  Konbougou pour les siens -->
+  <g transform="translate(620, 370) scale(0.85)">
+    <ellipse cx="50" cy="50" rx="45" ry="20" fill="#2d1712"/>
+    <ellipse cx="50" cy="46" rx="40" ry="16" fill="#164d56"/>
+    <path d="M5,50 L5,75 C5,86 25,95 50,95 C75,95 95,86 95,75 L95,50 Z" fill="#4d2b20"/>
+  </g>
+
+  <!-- Titre et sous-titre gravÃ©s -->
+  <text x="50" y="70" font-family="'Playfair Display', Georgia, serif" font-size="28" font-weight="600" fill="#fdf0ed" letter-spacing="2">GUIMBI OUATTARA</text>
+  <text x="50" y="95" font-family="'DM Sans', sans-serif" font-size="12" font-weight="700" fill="#fbc531" letter-spacing="4">L'ÂME SOUVERAINE DE SYA · GWIRIKO</text>
+</svg>
+

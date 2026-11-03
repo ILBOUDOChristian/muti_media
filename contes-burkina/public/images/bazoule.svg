@@ -1,0 +1,95 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -40 800 540" width="100%" height="100%">
+  <defs>
+    <linearGradient id="oasisSky" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#362016"/>
+      <stop offset="45%" stop-color="#7a4325"/>
+      <stop offset="85%" stop-color="#cc7c38"/>
+      <stop offset="100%" stop-color="#f5ba58"/>
+    </linearGradient>
+    <linearGradient id="waterOasis" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#2a5a54"/>
+      <stop offset="60%" stop-color="#3b7a70"/>
+      <stop offset="100%" stop-color="#1d3d38"/>
+    </linearGradient>
+    <linearGradient id="clayBank" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#c47842"/>
+      <stop offset="60%" stop-color="#8a4722"/>
+      <stop offset="100%" stop-color="#4e2612"/>
+    </linearGradient>
+    <linearGradient id="crocSkin" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4a5f36"/>
+      <stop offset="50%" stop-color="#324422"/>
+      <stop offset="100%" stop-color="#1e2c14"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Ciel de fin de journÃ©e de savane -->
+  <rect width="800" height="500" fill="url(#oasisSky)"/>
+
+  <!-- Soleil chaud rasant -->
+  <circle cx="220" cy="230" r="130" fill="#fcd97d" opacity="0.35"/>
+  <circle cx="220" cy="230" r="45" fill="#fff5cb"/>
+
+  <!-- Silhouette du grand baobab protecteur de la mare -->
+  <g transform="translate(630, 160) scale(0.85)">
+    <!-- Tronc imposant du baobab -->
+    <path d="M40,220 C25,160 20,90 35,50 C40,35 60,35 70,50 C85,90 85,160 80,220 Z" fill="#2d170f"/>
+    <ellipse cx="55" cy="40" rx="65" ry="24" fill="#2d170f"/>
+    <ellipse cx="25" cy="25" rx="45" ry="18" fill="#22110a"/>
+    <ellipse cx="85" cy="20" rx="50" ry="20" fill="#22110a"/>
+  </g>
+
+  <!-- Berges en terre d'argile et d'ocre -->
+  <path d="M0,350 Q260,320 500,360 T800,340 L800,500 L0,500 Z" fill="url(#clayBank)"/>
+
+  <!-- Mare d'eau sacrÃ©e oÃ¹ vivent les crocodiles en libertÃ© -->
+  <ellipse cx="320" cy="425" rx="360" ry="90" fill="url(#waterOasis)"/>
+  <ellipse cx="320" cy="425" rx="300" ry="70" fill="#4d998c" opacity="0.25"/>
+
+  <!-- Crocodile sacrÃ© du Nil reposant en confiance sur la berge -->
+  <g transform="translate(340, 360)">
+    <!-- Queue longue et musclÃ©e ondulant vers l'eau -->
+    <path d="M-190,45 C-140,40 -80,25 -20,20 C-10,32 -60,42 -120,48 C-160,52 -185,50 -190,45 Z" fill="#243418"/>
+    <!-- CrÃªte dorsale crÃ©nelÃ©e sur la queue -->
+    <polygon points="-160,42 -155,34 -150,42" fill="#1b2812"/>
+    <polygon points="-135,38 -130,30 -125,38" fill="#1b2812"/>
+    <polygon points="-110,34 -105,25 -100,34" fill="#1b2812"/>
+    <polygon points="-85,30 -80,20 -75,30" fill="#1b2812"/>
+    <polygon points="-60,26 -55,16 -50,26" fill="#1b2812"/>
+
+    <!-- Corps massif et cuirassÃ© -->
+    <path d="M-30,18 C10,12 80,10 140,20 C155,38 120,48 50,48 C-10,48 -25,32 -30,18 Z" fill="url(#crocSkin)"/>
+
+    <!-- Plaques dorsales osseuses (Ã©cailles protectrices) -->
+    <g fill="#1b2812">
+      <polygon points="-10,18 -5,8 0,18"/>
+      <polygon points="15,16 20,6 25,16"/>
+      <polygon points="40,15 45,5 50,15"/>
+      <polygon points="65,15 70,5 75,15"/>
+      <polygon points="90,16 95,6 100,16"/>
+      <polygon points="115,18 120,9 125,18"/>
+    </g>
+
+    <!-- Pattes courtes et fortes -->
+    <path d="M10,42 C15,58 35,62 45,55 C38,45 30,42 22,42 Z" fill="#1e2c14"/>
+    <path d="M100,40 C108,55 125,58 132,50 C125,42 118,40 110,40 Z" fill="#1e2c14"/>
+
+    <!-- TÃªte et museau puissant tournÃ© vers la lumiÃ¨re -->
+    <path d="M140,20 C175,22 215,26 230,32 C225,40 195,45 155,42 C145,35 140,25 140,20 Z" fill="url(#crocSkin)"/>
+    <!-- Å’il paisible (sans agressivitÃ©) -->
+    <ellipse cx="165" cy="22" rx="4.5" ry="3" fill="#ffe066" stroke="#221100" stroke-width="1"/>
+    <circle cx="165" cy="22" r="1.5" fill="#110800"/>
+    <!-- Narine au bout du museau -->
+    <circle cx="222" cy="28" r="1.8" fill="#1b2812"/>
+  </g>
+
+  <!-- NÃ©nuphars et flore aquatique de la mare -->
+  <ellipse cx="160" cy="440" rx="22" ry="9" fill="#2d6e4b"/>
+  <ellipse cx="230" cy="460" rx="18" ry="7" fill="#2d6e4b"/>
+  <circle cx="232" cy="458" r="3" fill="#fcd253"/>
+
+  <!-- Titre et sous-titre gravÃ©s -->
+  <text x="50" y="70" font-family="'Playfair Display', Georgia, serif" font-size="28" font-weight="600" fill="#fff6e4" letter-spacing="2">LES CROCODILES DE BAZOULÉ</text>
+  <text x="50" y="95" font-family="'DM Sans', sans-serif" font-size="12" font-weight="700" fill="#ffd066" letter-spacing="4">LE PACTE DE L'EAU · KOOM LAKRÉ</text>
+</svg>
+
